@@ -1,0 +1,13 @@
+{
+  "SERVER_PORT"           : 6000,
+  "SERVER_CLUSTERS"       : 4,
+  "NB_NODES_IN_CLUSTER"   : 4,
+  "NB_NODES_TO_REPLICATE" : 2,
+  "NODES"                 : [
+      { "host" : "localhost", "port" : 6000 }
+    , { "host" : "localhost", "port" : 6001 }
+    , { "host" : "localhost", "port" : 6002 }
+    , { "host" : "localhost", "port" : 6003 }
+  ],
+  "LOGS_DIRECTORY" : "logs"
+}

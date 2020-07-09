@@ -1,0 +1,43 @@
+#!/usr/bin/env node
+const path = require('path');
+const fs   = require('fs');
+const salt = require('./src');
+
+let _config = {};
+
+let _path = process.cwd();
+
+function loadConfig () {
+  let _configPath = process.env.CONFIG ? path.join(process.cwd(), process.env.CONFIG) : path.join(_path, 'salt.json');
+  console.log(_configPath);
+  if (fs.existsSync(_configPath)) {
+    _config = fs.readFileSync(_configPath, 'utf8');
+
+    try {
+      _config = JSON.parse(_config);
+    }
+    catch (e) {
+      throw new Error('.salt is not a valid JSON file');
+
+    }
+  }
+}
+
+function printUsage () {
+  console.log('salt')
+  console.log('===============================================');
+  console.group('Commands');
+  console.log('start', '\t', 'Start the server');
+  console.groupEnd('Commands');
+}
+
+let _args = process.argv.slice(2);
+
+let _commands = ['start'];
+
+if (_commands.indexOf(_args[0]) === -1) {
+  return printUsage();
+}
+
+loadConfig();
+salt.start(_config);
