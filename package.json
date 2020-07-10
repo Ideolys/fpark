@@ -8,12 +8,14 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "busboy": "^0.3.1",
     "fast-proxy": "^1.6.3",
     "find-my-way": "^2.0.1",
     "jsonwebtoken": "^8.5.1",
     "kitten-cache": "0.3.0",
     "kitten-logger": "0.1.14",
     "mocha": "^8.0.1",
+    "sharp": "^0.25.4",
     "should": "^13.2.3"
   },
   "directories": {

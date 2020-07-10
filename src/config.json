@@ -1,13 +1,11 @@
 {
-  "SERVER_PORT"           : 6000,
-  "SERVER_CLUSTERS"       : 4,
-  "NB_NODES_IN_CLUSTER"   : 4,
-  "NB_NODES_TO_REPLICATE" : 2,
-  "NODES"                 : [
-      { "host" : "localhost", "port" : 6000 }
-    , { "host" : "localhost", "port" : 6001 }
-    , { "host" : "localhost", "port" : 6002 }
-    , { "host" : "localhost", "port" : 6003 }
-  ],
-  "LOGS_DIRECTORY" : "logs"
+  "SERVER_PORT"     : 6000,
+  "SERVER_CLUSTERS" : 4,
+  "NODES"           : [],
+  "LOGS_DIRECTORY"  : "logs",
+  "FILE_DIRECTORY"  : "data",
+
+  "ENCRYPTION_IV"        : "srp9zyldyxdzmddx",
+  "ENCRYPTION_IV_LENGTH" : 16,
+  "ENCRYPTION_ALGORITHM" : "aes-128-ctr"
 }

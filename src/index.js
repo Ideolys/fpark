@@ -13,6 +13,7 @@ const api          = require('./api');
 const kittenLogger = require('kitten-logger');
 const CONFIG       = require('./config');
 const logger       = require('./logger');
+const utils        = require('./commons/utils');
 let server;
 
 /**
@@ -59,6 +60,8 @@ function runServer (config, callback) {
 
     return;
   }
+
+  utils.createDirIfNotExistsSync(CONFIG.FILE_DIRECTORY);
 
   api(router, { CONFIG });
 

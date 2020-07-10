@@ -73,6 +73,41 @@ function _sortNodes (nodes) {
 }
 
 /**
+ * Get next region by key
+ * @param {String} currentRegion
+ * @returns {String}
+ */
+function getNextRegionByKey (currentRegion) {
+  let regions     = Object.keys(nodesByRegion).sort();
+  let indexRegion = regions.indexOf(currentRegion + '');
+
+  if (indexRegion === -1) {
+    return currentRegion;
+  }
+
+  if (regions[indexRegion + 1]) {
+    return regions[indexRegion + 1];
+  }
+
+  return regions[0];
+}
+
+/**
+ * Get next region by index
+ * @param {String} currentRegion
+ * @returns {String}
+ */
+function getNextRegionByIndex (index) {
+  let regions = Object.keys(nodesByRegion).sort();
+
+  if (index < 0 || index > regions.length - 1) {
+    return regions[0];
+  }
+
+  return regions[index];
+}
+
+/**
  * Get nodes to persist to
  * @param {String} str
  * @param {Array} of nodes { id : Number, host : String, port : Number }
@@ -93,13 +128,13 @@ function getNodesToPersistTo (str, nodes) {
   nodesToPersist.push(firstNode);
 
   let region     = getRegionForNode(firstNode);
-  let nextRegion = region + 1;
+  let nextRegion = getNextRegionByKey(region);
 
   let indexSecondReplica = nodesByRegion[region].indexOf(firstNode);
   nodesToPersist.push(nodesByRegion[nextRegion][indexSecondReplica]);
 
-  let regionThirdReplica = (hashIndex % nbRegions) + 1;
-  let indexThirdReplica  = hashIndex + 1;
+  let regionThirdReplica = getNextRegionByIndex(hashIndex % nbRegions);
+  let indexThirdReplica  = indexSecondReplica + 1;
   if (indexThirdReplica >= nodesByRegion[regionThirdReplica].length) {
     indexThirdReplica = 0;
   }
@@ -128,10 +163,26 @@ function isCurrentNodeInPersistentNodes (nodes, nodeId) {
   return false;
 }
 
+/**
+ * Flatten nodes
+ * @param {Array} nodes
+ * @returns {String} "node1Id-node2Id-node3Id"
+ */
+function flattenNodes (nodes) {
+  let res = '';
+
+  for (let i = 0; i< nodes.length; i++) {
+    res += '-' + nodes[i].id;
+  }
+
+  return res.slice(1);
+}
+
 module.exports = {
   getNodesToPersistTo,
   hash,
   isCurrentNodeInPersistentNodes,
+  flattenNodes,
 
   /**
    * Only for tests

@@ -102,6 +102,23 @@ describe('Repartition', () => {
         , { id : 200, host : 'localhost', port : 6002 }
       ]);
     });
+
+    it('should return three nodes with first node in second region', () => {
+      let nodes = [
+          { id : 100, host : 'localhost', port : 6000 }
+        , { id : 101, host : 'localhost', port : 6001 }
+        , { id : 200, host : 'localhost', port : 6002 }
+        , { id : 201, host : 'localhost', port : 6003 }
+      ];
+
+      let nodesToPersit = repartition.getNodesToPersistTo('test-2.png', nodes);
+
+      should(nodesToPersit).eql([
+          { id : 200, host : 'localhost', port : 6002 }
+        , { id : 100, host : 'localhost', port : 6000 }
+        , { id : 101, host : 'localhost', port : 6001 }
+      ]);
+    });
   });
 
   describe('isCurrentNodeInPersistentNodes()', () => {
