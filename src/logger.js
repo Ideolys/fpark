@@ -1,9 +1,7 @@
 const crypto       = require('crypto');
 const kittenLogger = require('kitten-logger');
 
-kittenLogger.addFormatter('http:start', (msg) => {
-  return (msg.method || msg.type || '').toUpperCase() + ' ' + decodeURIComponent(msg.url || '') + ' from ' + msg.ip + ' nth-node: ' + msg.headers['fpark-nth-node'] + ' from-node: ' + msg.headers['fpark-from-node'];
-});
+kittenLogger.addFormatter('http:start', kittenLogger.formattersCollection.http_start);
 kittenLogger.addFormatter('http:end'  , kittenLogger.formattersCollection.http_end);
 
 const loggerStart  = kittenLogger.createPersistentLogger('http:start');
@@ -20,8 +18,7 @@ function getMessageForReq (req) {
   return {
     method  : req.method,
     url     : req.url,
-    ip      : req.headers['x-forwarded-for'] || req.connection.remoteAddress || req.ip,
-    headers : req.headers
+    ip      : req.headers['x-forwarded-for'] || req.connection.remoteAddress || req.ip
   };
 }
 
