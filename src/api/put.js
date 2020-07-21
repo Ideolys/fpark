@@ -4,18 +4,24 @@ const { pipeline } = require('stream');
 const { proxy }    = require('fast-proxy')({});
 const Busboy       = require('busboy');
 const repartition  = require('../commons/repartition');
-const utils        = require('../commons/utils');
 const encryption   = require('../commons/encryption');
 const file         = require('../commons/file');
+const request      = require('../commons/request');
 const zlib         = require('zlib');
+const FormData     = require('form-data');
+const fetch = require('node-fetch');
+const {
+  respond,
+  createDirIfNotExists,
+  queue
+} = require('../commons/utils');
 const {
   getHeaderNthNode,
   setHeaderNthNode,
-  setHeaderCurrentNode
+  setHeaderCurrentNode,
+  getHeaderFromNode
 } = require('../commons/headers');
-
-const respond              = utils.respond;
-const createDirIfNotExists = utils.createDirIfNotExists;
+const { runInNewContext } = require('vm');
 
 function putFile (fileStream, params, store, keyNodes, isGzip, callback) {
   let pathDisk = path.join(store.CONFIG.FILE_DIRECTORY, keyNodes);
@@ -32,11 +38,14 @@ function putFile (fileStream, params, store, keyNodes, isGzip, callback) {
         return callback(true);
       }
 
-      let pathFile  = path.join(pathContainer, params.id + '.enc');
+      let filename     = file.getFileName(params.id, store.CONFIG.ENCRYPTION_IV_LENGTH);
+      let fileNameDisk = encryption.hash(filename, store.CONFIG.HASH_SECRET, store.CONFIG.HASH_ALGORITHM);
+
+      let pathFile  = path.join(pathContainer, fileNameDisk + '.enc');
       let _pipeline = [
         fileStream,
         encryption.encryptStream(
-          file.getFileName(params.id, store.CONFIG.ENCRYPTION_IV_LENGTH),
+          filename,
           store.CONFIG.ENCRYPTION_IV,
           store.CONFIG.ENCRYPTION_ALGORITHM
         ),
@@ -81,11 +90,17 @@ exports.putApi = function put (req, res, params, store) {
 
   let keyNodes = repartition.flattenNodes(nodes);
 
-  let busboy = new Busboy({ headers: req.headers });
+  let busboy = null;
+  try {
+    busboy = new Busboy({ headers: req.headers });
+  }
+  catch (e) {
+    return respond(res, 500);
+  }
 
   busboy.on('file', (fieldname, fileStream, filename, encoding, mimetype) => {
     if (!filename) {
-      return respond(res);
+      return respond(res, 500);
     }
 
     putFile(fileStream, params, store, keyNodes, false, (err) => {
@@ -93,16 +108,45 @@ exports.putApi = function put (req, res, params, store) {
         return respond(res, 500);
       }
 
-      respond(res, 200);
+      if (getHeaderFromNode(req.headers)) {
+        return respond(res, 200);
+      }
+
+      let headers =  {};
+      setHeaderCurrentNode(headers, store.CONFIG.ID);
+
+      queue(nodes, (node, next) => {
+        if (node.id === store.CONFIG.ID) {
+          return next();
+        }
+
+        let form = new FormData();
+        form.append('file', file.getFile(res, params, store, nodes, next, true, false));
+
+        setHeaderNthNode(headers, req.headers);
+
+        fetch(node.host + req.url, {
+          method : 'PUT',
+          body   : form,
+          headers
+        }).then(res => {
+          if (res.status !== 200) {
+            return next();
+          }
+
+          respond(res, 200);
+        }).catch(() => {
+          next();
+        })
+      }, () => {
+        respond(res, 200);
+      });
     });
   });
 
-  busboy.on('error' , () => {
-    respond(res);
-  });
-
-  busboy.on('finish', () => {
-    respond(res, 200);
+  busboy.on('error' , err => {
+    console.log(err);
+    respond(res, 500);
   });
 
   req.pipe(busboy);

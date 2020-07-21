@@ -4,6 +4,10 @@ const spawn     = require('child_process').spawn;
 const { queue } = require('../src/commons/utils');
 const utils = require('../src/commons/utils');
 
+const encryption = require('../src/commons/encryption');
+const file       = require('../src/commons/file');
+const { hash } = require('../src/commons/repartition');
+
 let tempFolderPath = path.join(__dirname, '.temp');
 let pidsFilePath   = path.join(tempFolderPath, 'pids');
 
@@ -84,9 +88,16 @@ function stopArchi (callback) {
   stopExecute(callback);
 }
 
+function getFileHash (str, secret) {
+  let filename = file.getFileName(str, 16);
+  return encryption.hash(filename, secret);
+}
+
 exports.execute               = execute;
 exports.stopExecute           = stopExecute;
 exports.deleteFolderRecursive = deleteFolderRecursive;
+exports.getFileHash           = getFileHash;
 
 exports.runArchi  = runArchi;
 exports.stopArchi = stopArchi;
+

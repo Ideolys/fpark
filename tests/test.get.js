@@ -1,11 +1,10 @@
-const server  = require('../src/index');
 const utils   = require('./utils');
 const request = require('../src/commons/request');
 const nodes   = require('./datasets/configs/100.json').NODES;
 const fs      = require('fs');
 const path    = require('path');
 
-describe.only('API GET', () => {
+describe('API GET', () => {
 
   before(done => {
     utils.runArchi('get', done);

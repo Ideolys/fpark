@@ -8,5 +8,6 @@
     , { "id" : 200, "host" : "http://localhost:6002" }
     , { "id" : 201, "host" : "http://localhost:6003" }
   ],
-  "FILE_DIRECTORY": "data_200"
+  "FILE_DIRECTORY": "data_200",
+  "HASH_SECRET" : "test"
 }

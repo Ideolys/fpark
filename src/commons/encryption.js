@@ -23,6 +23,19 @@ module.exports = {
    */
   decryptStream (key, iv, algorithm = 'aes-128-ctr') {
     return crypto.createDecipheriv(algorithm, key, iv);
+  },
+
+  /**
+   * Hash a string
+   * @param {String} string
+   * @param {String} secret
+   * @param {String} algorithm defautl sha256
+   * @returns {Stirng}
+   */
+  hash (string, secret, algorithm = 'sha256') {
+    return crypto.createHmac(algorithm, secret)
+                  .update(string)
+                  .digest('hex');
   }
 
 };

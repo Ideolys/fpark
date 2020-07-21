@@ -30,5 +30,10 @@ module.exports = function request (options, callback) {
     callback(err);
   });
 
-  request.end();
+  if (options.body) {
+    options.body.pipe(request);
+  }
+  else {
+    request.end();
+  }
 }

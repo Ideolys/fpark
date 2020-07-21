@@ -126,5 +126,47 @@ exports.getApi = function getApi (req, res, params, store) {
     });
   }
 
-  getFile(req, res, params, store, nodes);
+  file.getFile(res, params, store, nodes, () => {
+    if (getHeaderNthNode(req.headers) === 3 || getHeaderFromNode(req.headers)) {
+      return respond(res, 404);
+    }
+
+    let headers =  {
+      'accept-encoding' : 'gzip'
+    };
+    setHeaderCurrentNode(headers, store.CONFIG.ID);
+
+    // Try to get file from another node
+    // Save it
+    // Serve it
+    queue(nodes, (node, next) => {
+      if (node.id === store.CONFIG.ID) {
+        return next();
+      }
+
+      setHeaderNthNode(headers, req.headers);
+
+      request({
+        method : 'GET',
+        path   : req.url,
+        base   : node.host,
+        headers
+      }, (err, resRequest) => {
+        if (err) {
+          return next();
+        }
+
+        putFile(resRequest, params, store, keyNodes, true, err => {
+          if (err) {
+            return respond(r, 500);
+          }
+
+          getFile(req, res, params, store, nodes, true);
+        });
+      });
+    }, () => {
+      // No file has been found
+      respond(res, 404);
+    });
+  });
 }

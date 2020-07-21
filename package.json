@@ -21,6 +21,9 @@
   "directories": {
     "test": "tests"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "form-data": "^3.0.0",
+    "node-fetch": "^2.6.0"
+  },
   "description": ""
 }
