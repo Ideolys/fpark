@@ -75,7 +75,7 @@ function runServer (config, callback) {
       throw err;
     }
 
-    console.log('Server listening on: http://localost:' + CONFIG.SERVER_PORT);
+    console.log('Server listening on: http://localhost:' + CONFIG.SERVER_PORT);
   });
 }
 

@@ -4,8 +4,8 @@ module.exports = {
 
   /**
    * End HTTP request
-   * @param {*} res
-   * @param {*} code
+   * @param {Object} res
+   * @param {Int} code
    */
   respond : function respond (res, code) {
     res.statusCode = code || 500;
@@ -36,8 +36,36 @@ module.exports = {
     }
   },
 
-  padlz : function(n, len) {
-    for (n+=""; n.length < len; n = "0" + n);
+  /**
+   * Pad by zero a string to specified length
+   * @param {String} n
+   * @param {Int} length
+   */
+  padlz : function(n, length) {
+    for (n+=""; n.length < length; n = "0" + n);
     return n;
+  },
+
+  /**
+   * Queue
+   * @param {Array} items
+   * @param {Function} handler function to handle item in items -> handler(item, next {Function})
+   * @param {Function} done    function called when every items have been processed
+   */
+  queue (items, handler, done) {
+    var iterator = -1;
+
+    function next () {
+      iterator++;
+      var item = items[iterator];
+
+      if (!item) {
+        return done();
+      }
+
+      handler(items[iterator], next);
+    }
+
+    next();
   }
 };

@@ -7,5 +7,7 @@
 
   "ENCRYPTION_IV"        : "srp9zyldyxdzmddx",
   "ENCRYPTION_IV_LENGTH" : 16,
-  "ENCRYPTION_ALGORITHM" : "aes-128-ctr"
+  "ENCRYPTION_ALGORITHM" : "aes-128-ctr",
+
+  "CACHE_CONTROL_MAX_AGE": 7776000
 }
