@@ -49,7 +49,7 @@ function runServer (config, callback) {
     kittenLogger.init();
   }
 
-  if (cluster.isMaster && (CONFIG.SERVER_CLUSTERS) > 1) {
+  if (cluster.isMaster && CONFIG.SERVER_CLUSTERS > 1) {
     console.log(`[Cluster] master ${ process.pid } is running`);
 
     initCluster(CONFIG.SERVER_CLUSTERS);

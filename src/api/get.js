@@ -10,7 +10,8 @@ const request      = require('../commons/request');
 const {
   getHeaderNthNode,
   setHeaderNthNode,
-  setHeaderCurrentNode
+  setHeaderCurrentNode,
+  getHeaderFromNode
 } = require('../commons/headers');
 const {
   respond,
@@ -40,19 +41,24 @@ function getFile (req, res, params, store, nodes, isFromCurrentProcess = false) 
   );
 
   fileStream.on('error', () => {
-    if (getHeaderNthNode(req.headers) === 3) {
-      return respond(res, 500);
+    if (getHeaderNthNode(req.headers) === 3 || getHeaderFromNode(req.headers)) {
+      return respond(res, 404);
     }
+
+    let headers =  {
+      'accept-encoding' : 'gzip'
+    };
+    setHeaderCurrentNode(headers, store.CONFIG.ID);
 
     // Try to get file from another node
     // Save it
     // Serve it
     queue(nodes, (node, next) => {
-      let headers =  {
-        'accept-encoding' : 'gzip'
-      };
+      if (node.id === store.CONFIG.ID) {
+        return next();
+      }
+
       setHeaderNthNode(headers, req.headers);
-      setHeaderCurrentNode(headers, store.CONFIG.ID);
 
       request({
         method : 'GET',
@@ -73,7 +79,8 @@ function getFile (req, res, params, store, nodes, isFromCurrentProcess = false) 
         });
       });
     }, () => {
-      respond(res, 500);
+      // No file has been found
+      respond(res, 404);
     });
   });
 
@@ -106,6 +113,10 @@ exports.getApi = function getApi (req, res, params, store) {
   let isAllowedToWrite = repartition.isCurrentNodeInPersistentNodes(nodes, store.CONFIG.ID);
 
   if (!isAllowedToWrite) {
+    if (getHeaderNthNode(req.headers) === 3) {
+      return respond(res, 404);
+    }
+
     return proxy(req, res, nodes[0].host + req.url, {
       rewriteRequestHeaders (req, headers) {
         setHeaderNthNode(req.headers);

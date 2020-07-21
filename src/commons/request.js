@@ -19,10 +19,8 @@ module.exports = function request (options, callback) {
   options.port = parsedUrl.port;
 
   let request = httpLibrary.request(options, res => {
-    // res.setEncoding('utf8');
-
     if (res.statusCode !== 200) {
-      return callback(res.statusCode);
+      return callback(res.statusCode, res);
     }
 
     callback(null, res);

@@ -31,6 +31,14 @@ module.exports = {
    */
   getHeaderNthNode (headers) {
     return headers['fpark-nth-node'] ? parseInt(headers['fpark-nth-node'], 10) : 1;
-  }
+  },
 
+  /**
+   * Get value of header 'fpark-from-node'
+   * @param {Object} headers
+   * @returns {Int}
+   */
+  getHeaderFromNode (headers) {
+    return headers['fpark-from-node'] ? headers['fpark-from-node'] : null;
+  },
 };
