@@ -18,11 +18,47 @@ describe.only('API GET', () => {
     it('should return a 404 if the file does not exist', done => {
       request({
         base : node.host,
-        path : '/file/container/test/image.jpg',
+        path : '/file/container/test/1.jpg',
       }, (err, res) => {
         should(err).ok();
         should(res.statusCode).eql(404);
         done();
+      });
+    });
+
+    it('should get a file with gzip', done => {
+      request({
+        base : node.host,
+        path : '/file/container/test/image.jpg',
+      }, (err, res) => {
+        should(err).not.ok();
+        should(res.statusCode).eql(200);
+        should(res.headers['content-encoding']).eql('gzip');
+        done();
+      });
+    });
+
+    it('should set cache-control header', done => {
+      request({
+        base : node.host,
+        path : '/file/container/test/image.jpg',
+      }, (err, res) => {
+        should(err).not.ok();
+        should(res.statusCode).eql(200);
+        should(res.headers['content-encoding']).eql('gzip');
+        done();
+      });
+    });
+
+    it('should set cache-control header', done => {
+      request({
+        base : node.host,
+        path : '/file/container/test/image.jpg',
+      }, (err, res) => {
+        should(err).not.ok();
+        should(res.statusCode).eql(200);
+        should(res.headers['cache-control']).be.a.String().and.eql('max-age=7776000,immutable');
+        utils.stopExecute(done);
       });
     });
 
