@@ -3,7 +3,6 @@ const request = require('../src/commons/request');
 const fs      = require('fs');
 const path    = require('path');
 const config  = require('./datasets/configs/100.json');
-const file = require('../src/commons/file');
 const nodes   = config.NODES;
 
 describe('API GET', () => {
@@ -67,7 +66,7 @@ describe('API GET', () => {
 
     describe('Inter-node communication', () => {
 
-      it('should get a file not present on current node 101 : [File] 100; 200; 101', done => {
+      it('should get a file not present on current node 100 : 100; 200; [File] 101', done => {
         request({
           base : nodes[0].host,
           path : '/file/container/test/image.jpg',
@@ -86,7 +85,7 @@ describe('API GET', () => {
         });
       });
 
-      it('should get a file not present on current node 200 : [File] 100; 200; 101', done => {
+      it('should get a file not present on current node 200 : 100; 200; [File] 101', done => {
         request({
           base : nodes[2].host,
           path : '/file/container/test/image.jpg',

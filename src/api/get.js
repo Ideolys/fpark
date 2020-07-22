@@ -1,12 +1,10 @@
-const fs           = require('fs');
-const path         = require('path');
-const zlib         = require('zlib');
-const { proxy }    = require('fast-proxy')({});
-const { putFile }  = require('./put');
-const repartition  = require('../commons/repartition');
-const encryption   = require('../commons/encryption');
-const file         = require('../commons/file');
-const request      = require('../commons/request');
+
+const zlib        = require('zlib');
+const { proxy }   = require('fast-proxy')({});
+const fetch       = require('node-fetch');
+const { putFile } = require('./put');
+const repartition = require('../commons/repartition');
+const file        = require('../commons/file');
 const {
   getHeaderNthNode,
   setHeaderNthNode,
@@ -17,6 +15,23 @@ const {
   respond,
   queue
 } = require('../commons/utils');
+
+
+function getFile (CONFIG, req, res, params, keyNodes, isGzip, handler) {
+  function handlerError (err) {
+    if (getHeaderNthNode(req.headers) === 3 || getHeaderFromNode(req.headers)) {
+      return respond(res, 404);
+    }
+
+    handler();
+  }
+
+  let streams = file.prepareStreams(CONFIG, keyNodes, params, isGzip, handlerError);
+
+  if (res) {
+    streams.pipe(res);
+  }
+}
 
 /**
  * Get API
@@ -45,11 +60,10 @@ exports.getApi = function getApi (req, res, params, store) {
 
   let keyNodes = repartition.flattenNodes(nodes);
 
-  file.getFile(res, params, store, keyNodes, () => {
-    if (getHeaderNthNode(req.headers) === 3 || getHeaderFromNode(req.headers)) {
-      return respond(res, 404);
-    }
+  res.setHeader('Cache-Control', 'max-age=' + store.CONFIG.CACHE_CONTROL_MAX_AGE + ',immutable');
+  res.setHeader('Content-Encoding', 'gzip');
 
+  getFile(store.CONFIG, req, res, params, keyNodes, true, () => {
     let headers =  {
       'accept-encoding' : 'gzip'
     };
@@ -67,25 +81,25 @@ exports.getApi = function getApi (req, res, params, store) {
 
       let _req =  {
         method : 'GET',
-        path   : req.url,
-        base   : node.host,
-        headers
+        headers,
       };
 
-      request(_req, (err, resRequest) => {
-        if (err) {
+      fetch(node.host + req.url, _req).then((resRequest) => {
+        if (resRequest.status !== 200) {
           return next();
         }
 
-        putFile(resRequest, params, store, keyNodes, true, err => {
+        putFile(resRequest.body, params, store, keyNodes, null, err => {
           if (err) {
-            return respond(r, 500);
+            return respond(res, 500);
           }
 
-          file.getFile(res, params, store, keyNodes, () => {
+          getFile(store.CONFIG, _req, res, params, keyNodes, false, () => {
             respond(res, 404);
-          }, true, true);
+          });
         });
+      }).catch(() => {
+        next();
       });
     }, () => {
       // No file has been found

@@ -10,6 +10,15 @@ module.exports = {
   },
 
   /**
+   * Set header 'fpark-replication-from-node'
+   * @param {Object} headers
+   * @param {Int} nodeId
+   */
+  setHeaderReplication (headers, nodeId) {
+    headers['fpark-replication-from-node'] = nodeId;
+  },
+
+  /**
    * Set header 'fpark-nth-node'
    * @param {Object} headers
    * @param {Object} reqHeaders
@@ -40,5 +49,14 @@ module.exports = {
    */
   getHeaderFromNode (headers) {
     return headers['fpark-from-node'] ? headers['fpark-from-node'] : null;
+  },
+
+  /**
+   * Get value of header 'fpark-from-node'
+   * @param {Object} headers
+   * @returns {Int}
+   */
+  getHeaderReplication (headers) {
+    return headers['fpark-replication-from-node'] ? headers['fpark-replication-from-node'] : null;
   },
 };

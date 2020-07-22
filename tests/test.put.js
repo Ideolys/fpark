@@ -36,7 +36,7 @@ describe('API PUT', () => {
             should(err).not.ok();
             utils.deleteFolderRecursive(pathDir);
 
-            pathDir  = path.join(__dirname, 'datasets', 'put', 'data_201', '101-200-201');
+            pathDir  = path.join(__dirname, 'datasets', 'put', 'data_200', '101-200-201');
             fs.access(path.join(pathDir, 'test', filename + '.enc'), fs.constants.F_OK, err => {
               should(err).not.ok();
               utils.deleteFolderRecursive(pathDir);

@@ -6,7 +6,6 @@ const Busboy       = require('busboy');
 const repartition  = require('../commons/repartition');
 const encryption   = require('../commons/encryption');
 const file         = require('../commons/file');
-const zlib         = require('zlib');
 const FormData     = require('form-data');
 const fetch        = require('node-fetch');
 const {
@@ -18,11 +17,12 @@ const {
   getHeaderNthNode,
   setHeaderNthNode,
   setHeaderCurrentNode,
-  getHeaderFromNode
+  getHeaderFromNode,
+  getHeaderReplication,
+  setHeaderReplication
 } = require('../commons/headers');
-const { runInNewContext } = require('vm');
 
-function putFile (fileStream, params, store, keyNodes, isGzip, callback) {
+function putFile (fileStream, params, store, keyNodes, isFromAnotherNode, callback) {
   let pathDisk = path.join(store.CONFIG.FILE_DIRECTORY, keyNodes);
   createDirIfNotExists(pathDisk, err => {
     if (err) {
@@ -43,23 +43,22 @@ function putFile (fileStream, params, store, keyNodes, isGzip, callback) {
       let pathFile  = path.join(pathContainer, fileNameDisk + '.enc');
       let _pipeline = [
         fileStream,
-        encryption.encryptStream(
-          filename,
-          store.CONFIG.ENCRYPTION_IV,
-          store.CONFIG.ENCRYPTION_ALGORITHM
-        ),
         fs.createWriteStream(pathFile),
         err => {
           if (err) {
-            return console.log('Write pipeline error', err);
+            console.log('Write pipeline error', err);
           }
 
-          callback();
+          callback(err);
         }
       ];
 
-      if (isGzip) {
-        _pipeline.splice(1, 0, zlib.createGunzip());
+      if (isFromAnotherNode === null) {
+        _pipeline.splice(1, 0, encryption.encryptStream(
+          filename,
+          store.CONFIG.ENCRYPTION_IV,
+          store.CONFIG.ENCRYPTION_ALGORITHM
+        ));
       }
 
       pipeline.apply(null, _pipeline);
@@ -102,9 +101,7 @@ exports.putApi = function put (req, res, params, store) {
       return respond(res, 500);
     }
 
-    let keyNodes = repartition.flattenNodes(nodes);
-
-    putFile(fileStream, params, store, keyNodes, false, (err) => {
+    putFile(fileStream, params, store, keyNodes, getHeaderReplication(req.headers), (err) => {
       if (err) {
         return respond(res, 500);
       }
@@ -115,23 +112,26 @@ exports.putApi = function put (req, res, params, store) {
 
       let headers =  {};
       setHeaderCurrentNode(headers, store.CONFIG.ID);
+      setHeaderReplication(headers, store.CONFIG.ID)
 
       queue(nodes, (node, next) => {
         if (node.id === store.CONFIG.ID) {
           return next();
         }
 
-        let form = new FormData();
-        form.append('file', file.getFile(res, params, store, keyNodes, next, true, false));
+        let form    = new FormData();
+        let streams = file.getFilePath(store.CONFIG, keyNodes, params).path;
+        form.append('file', fs.createReadStream(streams));
 
+        Object.assign(headers, form.getHeaders());
         setHeaderNthNode(headers, req.headers);
 
         fetch(node.host + req.url, {
           method : 'PUT',
           body   : form,
           headers
-        }).then(res => {
-          if (res.status !== 200) {
+        }).then(resFetch => {
+          if (resFetch.status !== 200) {
             return next();
           }
 
@@ -140,13 +140,12 @@ exports.putApi = function put (req, res, params, store) {
           next();
         })
       }, () => {
-        respond(res, 200);
+        respond(res, 500);
       });
     });
   });
 
   busboy.on('error' , err => {
-    console.log(err);
     respond(res, 500);
   });
 
