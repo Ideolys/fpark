@@ -1,7 +1,7 @@
 const should      = require('should');
 const repartition = require('../src/commons/repartition');
 
-describe.only('Repartition', () => {
+describe('Repartition', () => {
 
   describe('hash()', () => {
     it('should be defined', () => {
