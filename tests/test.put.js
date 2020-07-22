@@ -30,13 +30,13 @@ describe('API PUT', () => {
         }).then(res => {
           should(res.status).eql(200);
 
-          let pathDir  = path.join(__dirname, 'datasets', 'put', 'data_101', '101-201-200');
+          let pathDir  = path.join(__dirname, 'datasets', 'put', 'data_101', '101-200-201');
           let filename = utils.getFileHash('file.txt', config.HASH_SECRET);
           fs.access(path.join(pathDir, 'test', filename + '.enc'), fs.constants.F_OK, err => {
             should(err).not.ok();
             utils.deleteFolderRecursive(pathDir);
 
-            pathDir  = path.join(__dirname, 'datasets', 'put', 'data_201', '101-201-200');
+            pathDir  = path.join(__dirname, 'datasets', 'put', 'data_201', '101-200-201');
             fs.access(path.join(pathDir, 'test', filename + '.enc'), fs.constants.F_OK, err => {
               should(err).not.ok();
               utils.deleteFolderRecursive(pathDir);
@@ -58,12 +58,12 @@ describe('API PUT', () => {
         }).then(res => {
           should(res.status).eql(200);
 
-          let pathDir  = path.join(__dirname, 'datasets', 'put', 'data_100', '101-201-200');
+          let pathDir  = path.join(__dirname, 'datasets', 'put', 'data_100', '101-200-201');
           let filename = utils.getFileHash('file.txt', config.HASH_SECRET);
           fs.access(path.join(pathDir, 'test', filename + '.enc'), fs.constants.F_OK, err => {
             should(err).ok();
 
-            pathDir  = path.join(__dirname, 'datasets', 'put', 'data_101', '101-201-200');
+            pathDir  = path.join(__dirname, 'datasets', 'put', 'data_101', '101-200-201');
             fs.access(path.join(pathDir, 'test', filename + '.enc'), fs.constants.F_OK, err => {
               should(err).not.ok();
               utils.deleteFolderRecursive(pathDir);

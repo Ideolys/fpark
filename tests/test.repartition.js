@@ -1,7 +1,7 @@
 const should      = require('should');
 const repartition = require('../src/commons/repartition');
 
-describe('Repartition', () => {
+describe.only('Repartition', () => {
 
   describe('hash()', () => {
     it('should be defined', () => {
@@ -153,6 +153,34 @@ describe('Repartition', () => {
       , { id : 201, host : 'localhost', port : 6003 }
     ], 200);
       should(isAllowed).eql(true);
+    });
+
+  });
+
+  describe('flattenNodes()', () => {
+
+    it('should return a string', () => {
+      should(repartition.flattenNodes([
+        { id : 100, host : 'localhost', port : 6000 }
+      , { id : 101, host : 'localhost', port : 6001 }
+      , { id : 200, host : 'localhost', port : 6002 }
+      ])).be.a.String();
+    });
+
+    it('should return a string with node ids separated by -', () => {
+      should(repartition.flattenNodes([
+        { id : 100, host : 'localhost', port : 6000 }
+      , { id : 101, host : 'localhost', port : 6001 }
+      , { id : 200, host : 'localhost', port : 6002 }
+      ])).eql('100-101-200');
+    });
+
+    it('should sort nodes', () => {
+      should(repartition.flattenNodes([
+        { id : 200, host : 'localhost', port : 6002 }
+      , { id : 100, host : 'localhost', port : 6000 }
+      , { id : 101, host : 'localhost', port : 6001 }
+      ])).eql('100-101-200');
     });
 
   });

@@ -6,10 +6,9 @@ const Busboy       = require('busboy');
 const repartition  = require('../commons/repartition');
 const encryption   = require('../commons/encryption');
 const file         = require('../commons/file');
-const request      = require('../commons/request');
 const zlib         = require('zlib');
 const FormData     = require('form-data');
-const fetch = require('node-fetch');
+const fetch        = require('node-fetch');
 const {
   respond,
   createDirIfNotExists,
@@ -103,6 +102,8 @@ exports.putApi = function put (req, res, params, store) {
       return respond(res, 500);
     }
 
+    let keyNodes = repartition.flattenNodes(nodes);
+
     putFile(fileStream, params, store, keyNodes, false, (err) => {
       if (err) {
         return respond(res, 500);
@@ -121,7 +122,7 @@ exports.putApi = function put (req, res, params, store) {
         }
 
         let form = new FormData();
-        form.append('file', file.getFile(res, params, store, nodes, next, true, false));
+        form.append('file', file.getFile(res, params, store, keyNodes, next, true, false));
 
         setHeaderNthNode(headers, req.headers);
 

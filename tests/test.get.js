@@ -1,8 +1,10 @@
 const utils   = require('./utils');
 const request = require('../src/commons/request');
-const nodes   = require('./datasets/configs/100.json').NODES;
 const fs      = require('fs');
 const path    = require('path');
+const config  = require('./datasets/configs/100.json');
+const file = require('../src/commons/file');
+const nodes   = config.NODES;
 
 describe('API GET', () => {
 
@@ -73,8 +75,9 @@ describe('API GET', () => {
           should(err).not.ok();
           should(res.statusCode).eql(200);
 
-          let pathDir = path.join(__dirname, 'datasets', 'get', 'data_100', '100-200-101');
-          fs.access(path.join(pathDir, 'test', 'image.jpg.enc'), (err) => {
+          let pathDir  = path.join(__dirname, 'datasets', 'get', 'data_100', '100-101-200');
+          let filename = utils.getFileHash('image.jpg', config.HASH_SECRET);
+          fs.access(path.join(pathDir, 'test', filename + '.enc'), (err) => {
             should(err).not.ok();
 
             utils.deleteFolderRecursive(pathDir);
@@ -91,8 +94,9 @@ describe('API GET', () => {
           should(err).not.ok();
           should(res.statusCode).eql(200);
 
-          let pathDir = path.join(__dirname, 'datasets', 'get', 'data_200', '100-200-101');
-          fs.access(path.join(pathDir, 'test', 'image.jpg.enc'), (err) => {
+          let pathDir = path.join(__dirname, 'datasets', 'get', 'data_200', '100-101-200');
+          let filename = utils.getFileHash('image.jpg', config.HASH_SECRET);
+          fs.access(path.join(pathDir, 'test', filename + '.enc'), (err) => {
             should(err).not.ok();
 
             utils.deleteFolderRecursive(pathDir);

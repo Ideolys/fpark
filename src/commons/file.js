@@ -23,16 +23,16 @@ module.exports = {
 
   /**
    * Get a file
-   * @param {Object} req
    * @param {Object} res
    * @param {Object} params
    * @param {Object} store { CONFIG }
    * @param {Array} nodes array of authorized nodes to handle request
-   * @param {Boolean} isFromCurrentProcess
+   * @param {Function} handler for error
+   * @param {Boolean} isFromCurrentProcess @default false // if true, do add already defined header
+   * @param {Boolean} isPipeToRes@default true
    */
   getFile (res, params, store, nodes, handler, isFromCurrentProcess = false, isPipeToRes = true) {
-    let keyNodes     = repartition.flattenNodes(nodes);
-    let pathDisk     = path.resolve(path.join(store.CONFIG.FILE_DIRECTORY, keyNodes));
+    let pathDisk     = path.resolve(path.join(store.CONFIG.FILE_DIRECTORY, nodes));
     let filename     = this.getFileName(params.id, store.CONFIG.ENCRYPTION_IV_LENGTH);
     let fileNameDisk = encryption.hash(filename, store.CONFIG.HASH_SECRET, store.CONFIG.HASH_ALGORITHM);
     let filePath     = path.join(pathDisk, params.containerId, fileNameDisk + '.enc');
@@ -46,7 +46,6 @@ module.exports = {
     );
 
     fileStream.on('error', err => {
-      console.log(err);
       handler();
     });
 
