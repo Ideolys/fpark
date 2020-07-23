@@ -16,6 +16,16 @@ const {
 } = require('../commons/utils');
 
 
+/**
+ * Get a file (initialize streams)
+ * @param {Object} CONFIG
+ * @param {Object} req
+ * @param {Object} res
+ * @param {Object} params request's params
+ * @param {String} keyNodes path 'node1-node2-node3'
+ * @param {Boolean} isGzip
+ * @param {Function} handler handler if error
+ */
 function getFile (CONFIG, req, res, params, keyNodes, isGzip, handler) {
   function handlerError (err) {
     if (getHeaderNthNode(req.headers) === 3 || getHeaderFromNode(req.headers)) {
