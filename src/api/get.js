@@ -1,10 +1,11 @@
 
-const zlib        = require('zlib');
-const { proxy }   = require('fast-proxy')({});
-const fetch       = require('node-fetch');
-const { putFile } = require('./put');
-const repartition = require('../commons/repartition');
-const file        = require('../commons/file');
+const zlib         = require('zlib');
+const { proxy }    = require('fast-proxy')({});
+const fetch        = require('node-fetch');
+const { putFile }  = require('./put');
+const repartition  = require('../commons/repartition');
+const file         = require('../commons/file');
+const proxyFactory = require('../commons/proxy');
 const {
   getHeaderNthNode,
   setHeaderNthNode,
@@ -49,12 +50,26 @@ exports.getApi = function getApi (req, res, params, store) {
       return respond(res, 404);
     }
 
-    return proxy(req, res, nodes[0].host + req.url, {
-      rewriteRequestHeaders (req, headers) {
-        setHeaderNthNode(req.headers);
-        setHeaderCurrentNode(req.headers, store.CONFIG.ID);
-        return headers;
+    return queue(nodes, (node, next) => {
+      if (node.id === store.CONFIG.ID) {
+        return next();
       }
+
+      let proxy = proxyFactory(() => {
+        return respond(res, 500);
+      });
+
+      let headers = {};
+      setHeaderNthNode(headers, req.headers);
+      setHeaderCurrentNode(headers, store.CONFIG.ID);
+
+      proxy(req, res, {
+        selfHandleResponse : true,
+        target             : node.host,
+        headers
+      });
+    }, () => {
+      respond(res, 500);
     });
   }
 
