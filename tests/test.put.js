@@ -132,6 +132,37 @@ describe('API PUT', () => {
 
     });
 
+    describe('Image', () => {
+
+      it('should upload a file & replicate', done => {
+        let formData = new FormData();
+        formData.append('file', fs.createReadStream(path.join(__dirname, 'datasets', '_documents', 'image.jpg')));
+
+        fetch(nodes[1].host + '/file/container/test/image.jpg', {
+          method  : 'PUT',
+          body    : formData
+        }).then(res => {
+          should(res.status).eql(200);
+
+          let pathDir  = path.join(__dirname, 'datasets', 'put', 'data_101', '100-101-200');
+          let filename = utils.getFileHash('image.jpg', config.HASH_SECRET);
+          fs.access(path.join(pathDir, 'test', filename + '.enc'), fs.constants.F_OK, err => {
+            should(err).not.ok();
+            utils.deleteFolderRecursive(pathDir);
+
+            pathDir  = path.join(__dirname, 'datasets', 'put', 'data_100', '100-101-200');
+            fs.access(path.join(pathDir, 'test', filename + '.enc'), fs.constants.F_OK, err => {
+              should(err).not.ok();
+              utils.deleteFolderRecursive(pathDir);
+              done();
+            });
+          });
+        }).catch(err => {
+          done(err);
+        });
+      });
+
+    })
 
   });
 
