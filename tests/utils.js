@@ -70,15 +70,18 @@ function deleteFolderRecursive (path) {
   }
 };
 
-function runArchi (dataset, callback) {
-  killPreviousPids();
-  let nodes = [
-      ['start', '-c', path.join('..', 'configs', '100.json')]
-    , ['start', '-c', path.join('..', 'configs', '101.json')]
-    , ['start', '-c', path.join('..', 'configs', '200.json')]
-    , ['start', '-c', path.join('..', 'configs', '201.json')]
-  ];
+function runArchi (dataset, nodes, callback) {
+  if (typeof nodes === 'function') {
+    callback = nodes;
+    nodes    = [
+        ['start', '-c', path.join('..', 'configs', '100.json')]
+      , ['start', '-c', path.join('..', 'configs', '101.json')]
+      , ['start', '-c', path.join('..', 'configs', '200.json')]
+      , ['start', '-c', path.join('..', 'configs', '201.json')]
+    ];
+  }
 
+  killPreviousPids();
   utils.queue(nodes, (node, next) => {
     execute(node, dataset, next);
   }, callback);
