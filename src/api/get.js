@@ -1,6 +1,4 @@
 
-const zlib         = require('zlib');
-const { proxy }    = require('fast-proxy')({});
 const fetch        = require('node-fetch');
 const { putFile }  = require('./put');
 const repartition  = require('../commons/repartition');
