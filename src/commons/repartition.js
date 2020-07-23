@@ -169,9 +169,7 @@ function isCurrentNodeInPersistentNodes (nodes, nodeId) {
  * @returns {String} "node1Id-node2Id-node3Id"
  */
 function flattenNodes (nodes) {
-  nodes.sort((a, b) => {
-    return a.id - b.id;
-  });
+  _sortNodes(nodes);
 
   let res = '';
 
