@@ -74,9 +74,9 @@ describe('API GET', () => {
           should(err).not.ok();
           should(res.statusCode).eql(200);
 
-          let pathDir  = path.join(__dirname, 'datasets', 'get', 'data_100', '100-101-200');
+          let pathDir  = path.join(__dirname, 'datasets', 'get', 'data_100', '100-101-200', 'test');
           let filename = utils.getFileHash('image.jpg', config.HASH_SECRET);
-          fs.access(path.join(pathDir, 'test', filename + '.enc'), (err) => {
+          fs.access(path.join(pathDir, filename + '.enc'), (err) => {
             should(err).not.ok();
 
             utils.deleteFolderRecursive(pathDir);
@@ -93,9 +93,9 @@ describe('API GET', () => {
           should(err).not.ok();
           should(res.statusCode).eql(200);
 
-          let pathDir = path.join(__dirname, 'datasets', 'get', 'data_200', '100-101-200');
+          let pathDir = path.join(__dirname, 'datasets', 'get', 'data_200', '100-101-200', 'test');
           let filename = utils.getFileHash('image.jpg', config.HASH_SECRET);
-          fs.access(path.join(pathDir, 'test', filename + '.enc'), (err) => {
+          fs.access(path.join(pathDir, filename + '.enc'), (err) => {
             should(err).not.ok();
 
             utils.deleteFolderRecursive(pathDir);
@@ -107,14 +107,14 @@ describe('API GET', () => {
       it('should get a file from another node and not save it to the disk (not authorized)', function (done) {
         request({
           base : nodes[3].host,
-          path : '/file/container/test/a.png',
+          path : '/file/container/do-not-delete/a.png',
         }, (err, res) => {
           should(err).not.ok();
           should(res.statusCode).eql(200);
 
           let pathDir = path.join(__dirname, 'datasets', 'get', 'data_201', '100-101-200');
           let filename = utils.getFileHash('a.png', config.HASH_SECRET);
-          fs.access(path.join(pathDir, 'test', filename + '.enc'), (err) => {
+          fs.access(path.join(pathDir, 'do-not-delete', filename + '.enc'), (err) => {
             should(err).ok();
             done();
           });

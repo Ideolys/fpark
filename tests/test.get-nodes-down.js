@@ -40,9 +40,9 @@ describe('API GET : nodes down', () => {
           should(err).not.ok();
           should(res.statusCode).eql(200);
 
-          let pathDir  = path.join(__dirname, 'datasets', 'get', 'data_100', '100-101-200');
+          let pathDir  = path.join(__dirname, 'datasets', 'get', 'data_100', '100-101-200', 'test');
           let filename = utils.getFileHash('image.jpg', config.HASH_SECRET);
-          fs.access(path.join(pathDir, 'test', filename + '.enc'), (err) => {
+          fs.access(path.join(pathDir, filename + '.enc'), (err) => {
             should(err).not.ok();
 
             utils.deleteFolderRecursive(pathDir);
@@ -68,9 +68,9 @@ describe('API GET : nodes down', () => {
           should(err).not.ok();
           should(res.statusCode).eql(200);
 
-          let pathDir = path.join(__dirname, 'datasets', 'get', 'data_200', '100-101-200');
+          let pathDir = path.join(__dirname, 'datasets', 'get', 'data_200', '100-101-200', 'test');
           let filename = utils.getFileHash('image.jpg', config.HASH_SECRET);
-          fs.access(path.join(pathDir, 'test', filename + '.enc'), (err) => {
+          fs.access(path.join(pathDir, filename + '.enc'), (err) => {
             should(err).not.ok();
 
             utils.deleteFolderRecursive(pathDir);
