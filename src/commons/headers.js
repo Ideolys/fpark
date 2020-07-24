@@ -57,6 +57,6 @@ module.exports = {
    * @returns {Int}
    */
   getHeaderReplication (headers) {
-    return headers['fpark-replication-from-node'] ? headers['fpark-replication-from-node'] : null;
+    return headers['fpark-replication-from-node'];
   },
 };

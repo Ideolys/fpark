@@ -8,11 +8,13 @@ const repartition  = require('../commons/repartition');
 const encryption   = require('../commons/encryption');
 const file         = require('../commons/file');
 const proxyFactory = require('../commons/proxy');
+
 const {
   respond,
   createDirIfNotExists,
   queue
 } = require('../commons/utils');
+
 const {
   getHeaderNthNode,
   setHeaderNthNode,
@@ -21,6 +23,10 @@ const {
   getHeaderReplication,
   setHeaderReplication
 } = require('../commons/headers');
+
+const imageUtils    = require('../commons/image/utils');
+const imageCompress = require('../commons/image/compress');
+const imageResize   = require('../commons/image/resize');
 
 function putFile (fileStream, params, store, keyNodes, isFromAnotherNode, callback) {
   let pathDisk = path.join(store.CONFIG.FILE_DIRECTORY, keyNodes);
@@ -40,9 +46,16 @@ function putFile (fileStream, params, store, keyNodes, isFromAnotherNode, callba
       let filename     = file.getFileName(params.id, store.CONFIG.ENCRYPTION_IV_LENGTH);
       let fileNameDisk = encryption.hash(filename, store.CONFIG.HASH_SECRET, store.CONFIG.HASH_ALGORITHM);
 
+      let extension           = path.extname(filename);
+      let extensionWithoutDot = extension.replace('.', '');
+      let isImage             = imageUtils.isImage(extensionWithoutDot);
+
+      if (extension === '.png') {
+        extension = '.jpeg';
+      }
+
       let pathFile  = path.join(pathContainer, fileNameDisk + '.enc');
       let _pipeline = [
-        fileStream,
         fs.createWriteStream(pathFile),
         err => {
           if (err) {
@@ -53,14 +66,20 @@ function putFile (fileStream, params, store, keyNodes, isFromAnotherNode, callba
         }
       ];
 
-      if (isFromAnotherNode === null) {
-        _pipeline.splice(1, 0, encryption.encryptStream(
+      if (isFromAnotherNode == null) {
+        _pipeline.unshift(encryption.encryptStream(
           filename,
           store.CONFIG.ENCRYPTION_IV,
           store.CONFIG.ENCRYPTION_ALGORITHM
         ));
       }
 
+      if (isFromAnotherNode === undefined && isImage) {
+        _pipeline.unshift(imageCompress(store.CONFIG, extensionWithoutDot));
+        _pipeline.unshift(imageResize(store.CONFIG));
+      }
+
+      _pipeline.unshift(fileStream);
       pipeline.apply(null, _pipeline);
     });
   });
