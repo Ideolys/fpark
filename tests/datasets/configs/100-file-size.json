@@ -1,0 +1,15 @@
+{
+  "ID"              : 100,
+  "SERVER_PORT"     : 6000,
+  "SERVER_CLUSTERS" : 1,
+  "NODES"           : [
+    { "id" : 100, "host" : "http://localhost:6000" }
+  ],
+  "FILE_DIRECTORY": "data_100",
+  "HASH_SECRET" : "test",
+  "ENCRYPTION_IV"        : "srp9zyldyxdzmddx",
+  "ENCRYPTION_IV_LENGTH" : 16,
+  "ENCRYPTION_ALGORITHM" : "aes-128-ctr",
+
+  "MAX_FILE_SIZE" : 1000
+}

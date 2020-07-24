@@ -123,7 +123,12 @@ exports.putApi = function put (req, res, params, store) {
 
   let busboy = null;
   try {
-    busboy = new Busboy({ headers: req.headers });
+    busboy = new Busboy({
+      headers : req.headers,
+      limits  : {
+        fileSize : store.CONFIG.MAX_FILE_SIZE,
+      }
+    });
   }
   catch (e) {
     return respond(res, 500);
@@ -133,6 +138,14 @@ exports.putApi = function put (req, res, params, store) {
     if (!filename) {
       return respond(res, 500);
     }
+
+    /**
+     * File size reached
+     * https://github.com/mscdex/busboy/blob/967fce0db075cb02765814db3e322d4f64d33a42/lib/types/multipart.js#L221
+     */
+    fileStream.on('limit', () => {
+      return respond(res, 413);
+    });
 
     putFile(fileStream, params, store, keyNodes, getHeaderReplication(req.headers), (err) => {
       if (err) {

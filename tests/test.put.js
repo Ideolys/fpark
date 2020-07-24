@@ -11,17 +11,17 @@ const file     = require('../src/commons/file');
 
 describe('API PUT', () => {
 
-  before(done => {
-    utils.runArchi('put', done);
-  });
-
-  after(done => {
-    utils.stopArchi(done);
-  });
-
   describe('PUT /file/container/:containerId/:id', () => {
 
     describe('Document', () => {
+
+      before(done => {
+        utils.runArchi('put', done);
+      });
+
+      after(done => {
+        utils.stopArchi(done);
+      });
 
       it('should upload a file & replicate', done => {
         let formData = new FormData();
@@ -134,6 +134,14 @@ describe('API PUT', () => {
     });
 
     describe('Image', () => {
+
+      before(done => {
+        utils.runArchi('put', done);
+      });
+
+      after(done => {
+        utils.stopArchi(done);
+      });
 
       it('should upload an image & replicate', done => {
         let formData = new FormData();
@@ -280,7 +288,8 @@ describe('API PUT', () => {
 
         fetch(nodes[1].host + '/file/container/test/' + filenameOriginal, {
           method  : 'PUT',
-          body    : formData
+          body    : formData,
+          headers : formData.getHeaders()
         }).then(res => {
           should(res.status).eql(200);
 
@@ -370,6 +379,30 @@ describe('API PUT', () => {
           });
         }).catch(err => {
           done(err);
+        });
+      });
+
+    });
+
+    describe('limit', () => {
+
+      it('should not upload a file too large', done => {
+        utils.runArchi('put', [
+          ['start', '-c', path.join('..', 'configs', '100-file-size.json')]
+        ], () => {
+          let file     = 'image.jpg';
+          let formData = new FormData();
+          formData.append('file', fs.createReadStream(path.join(__dirname, 'datasets', '_documents', file)));
+
+          fetch(nodes[0].host + '/file/container/test/' + file, {
+            method : 'PUT',
+            body   : formData
+          }).then(res => {
+            should(res.status).eql(413);
+            utils.stopArchi(done);
+          }).catch(err => {
+            done(err);
+          });
         });
       });
 
