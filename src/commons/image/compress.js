@@ -16,17 +16,12 @@ const sharp = require('sharp');
 function compress (CONFIG, extension) {
   let pipeline = sharp();
 
-  if (extension === 'png') {
-    pipeline.toFormat('jpeg');
-    extension = 'jpeg';
-  }
-
   if (extension === 'jpeg' || extension === 'jpg') {
     pipeline.jpeg({ quality : CONFIG.IMAGE_COMPRESSION_LIMIT_JPEG || CONFIG.IMAGE_COMPRESSION_LIMIT });
   }
 
   if (extension === 'webp') {
-    // pipeline.webp({ quality : CONFIG.IMAGE_COMPRESSION_LIMIT_WEBP || CONFIG.IMAGE_COMPRESSION_LIMIT });
+    pipeline.webp({ quality : CONFIG.IMAGE_COMPRESSION_LIMIT_WEBP || CONFIG.IMAGE_COMPRESSION_LIMIT });
   }
 
   return pipeline;

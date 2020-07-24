@@ -163,7 +163,7 @@ describe('API PUT', () => {
         });
       });
 
-      it('should upload an image & compress', done => {
+      it('should upload an image & compress : jpeg', done => {
         let filenameOriginal = 'image.jpg';
         let pathFile         = path.join(__dirname, 'datasets', '_documents', filenameOriginal);
 
@@ -195,6 +195,60 @@ describe('API PUT', () => {
             utils.deleteFolderRecursive(pathDir);
 
             pathDir  = path.join(__dirname, 'datasets', 'put', 'data_100', '100-101-200');
+            filePath = path.join(pathDir, 'test', filename + '.enc');
+            fs.access(path.join(pathDir, 'test', filename + '.enc'), fs.constants.F_OK, err => {
+              should(err).not.ok();
+
+              filenameEncrypt  = file.getFileName(filenameOriginal, config.ENCRYPTION_IV_LENGTH);
+              cipher           = crypto.createDecipheriv(config.ENCRYPTION_ALGORITHM, filenameEncrypt, config.ENCRYPTION_IV);
+              fileData         = fs.readFileSync(filePath);
+
+              decrypted = cipher.update(fileData);
+              decrypted += cipher.final();
+
+              should(decrypted.length).lessThan(originalFileData.length);
+
+              utils.deleteFolderRecursive(pathDir);
+              done();
+            });
+          });
+        }).catch(err => {
+          done(err);
+        });
+      });
+
+      it('should upload an image & compress : webp', done => {
+        let filenameOriginal = 'image.webp';
+        let pathFile         = path.join(__dirname, 'datasets', '_documents', filenameOriginal);
+
+        let formData = new FormData();
+        formData.append('file', fs.createReadStream(pathFile));
+
+        fetch(nodes[1].host + '/file/container/test/' + filenameOriginal, {
+          method  : 'PUT',
+          body    : formData
+        }).then(res => {
+          should(res.status).eql(200);
+
+          let pathDir  = path.join(__dirname, 'datasets', 'put', 'data_101', '101-200-201');
+          let filename = utils.getFileHash(filenameOriginal, config.HASH_SECRET);
+          let filePath = path.join(pathDir, 'test', filename + '.enc');
+          fs.access(path.join(pathDir, 'test', filename + '.enc'), fs.constants.F_OK, err => {
+            should(err).not.ok();
+
+            let filenameEncrypt  = file.getFileName(filenameOriginal, config.ENCRYPTION_IV_LENGTH);
+            let cipher           = crypto.createDecipheriv(config.ENCRYPTION_ALGORITHM, filenameEncrypt, config.ENCRYPTION_IV);
+            let fileData         = fs.readFileSync(filePath);
+            let originalFileData = fs.readFileSync(pathFile);
+
+            let decrypted = cipher.update(fileData);
+            decrypted    += cipher.final();
+
+            should(decrypted.length).lessThan(originalFileData.length);
+
+            utils.deleteFolderRecursive(pathDir);
+
+            pathDir  = path.join(__dirname, 'datasets', 'put', 'data_200', '101-200-201');
             filePath = path.join(pathDir, 'test', filename + '.enc');
             fs.access(path.join(pathDir, 'test', filename + '.enc'), fs.constants.F_OK, err => {
               should(err).not.ok();
