@@ -268,6 +268,57 @@ describe('API PUT', () => {
         });
       });
 
+      it('should upload an image & not resize if image is < to default max size', done => {
+        let filenameOriginal = 'image.jpg';
+        let pathFile         = path.join(__dirname, 'datasets', '_documents', filenameOriginal);
+
+        let formData = new FormData();
+        formData.append('file', fs.createReadStream(pathFile));
+
+        fetch(nodes[1].host + '/file/container/test/' + filenameOriginal, {
+          method  : 'PUT',
+          body    : formData
+        }).then(res => {
+          should(res.status).eql(200);
+
+          let pathDir  = path.join(__dirname, 'datasets', 'put', 'data_101', '100-101-200');
+          let filename = utils.getFileHash(filenameOriginal, config.HASH_SECRET);
+          let filePath = path.join(pathDir, 'test', filename + '.enc');
+          fs.access(filePath, fs.constants.F_OK, err => {
+            should(err).not.ok();
+
+            let filenameEncrypt = file.getFileName(filenameOriginal, config.ENCRYPTION_IV_LENGTH);
+            let cipher          = crypto.createDecipheriv(config.ENCRYPTION_ALGORITHM, filenameEncrypt, config.ENCRYPTION_IV);
+
+            fs.createReadStream(filePath).pipe(cipher).pipe(sharp().metadata((err, metadata) => {
+              should(err).not.ok();
+              should(metadata.width).lessThan(config.IMAGE_SIZE_DEFAULT_WIDTH);
+
+              utils.deleteFolderRecursive(pathDir);
+
+              pathDir  = path.join(__dirname, 'datasets', 'put', 'data_100', '100-101-200');
+              filePath = path.join(pathDir, 'test', filename + '.enc');
+              fs.access(filePath, fs.constants.F_OK, err => {
+                should(err).not.ok();
+
+                filenameEncrypt  = file.getFileName(filenameOriginal, config.ENCRYPTION_IV_LENGTH);
+                cipher           = crypto.createDecipheriv(config.ENCRYPTION_ALGORITHM, filenameEncrypt, config.ENCRYPTION_IV);
+
+                fs.createReadStream(filePath).pipe(cipher).pipe(sharp().metadata((err, metadata) => {
+                  should(err).not.ok();
+                  should(metadata.width).lessThan(config.IMAGE_SIZE_DEFAULT_WIDTH);
+
+                  utils.deleteFolderRecursive(pathDir);
+                  done();
+                }));
+              });
+            }));
+          });
+        }).catch(err => {
+          done(err);
+        });
+      });
+
     })
 
   });
