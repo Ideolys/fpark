@@ -5,7 +5,7 @@ const path   = require('path');
 const config = require('./datasets/configs/100.json');
 const nodes  = config.NODES;
 
-describe.only('API GET', () => {
+describe('API GET', () => {
 
   before(done => {
     utils.runArchi('get', done);

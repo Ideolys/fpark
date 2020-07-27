@@ -1,9 +1,9 @@
-const utils   = require('./utils');
-const request = require('../src/commons/request');
-const fs      = require('fs');
-const path    = require('path');
-const config  = require('./datasets/configs/100.json');
-const nodes   = config.NODES;
+const utils  = require('./utils');
+const fetch  = require('node-fetch');
+const fs     = require('fs');
+const path   = require('path');
+const config = require('./datasets/configs/100.json');
+const nodes  = config.NODES;
 
 describe('API GET : nodes down', () => {
 
@@ -14,14 +14,12 @@ describe('API GET : nodes down', () => {
           ['start', '-c', path.join('..', 'configs', '100.json')]
         , ['start', '-c', path.join('..', 'configs', '101.json')]
       ], () => {
-        request({
-          base : nodes[1].host,
-          path : '/file/container/test/1.jpg',
-        }, (err, res) => {
-          should(err).ok();
-          should(res.statusCode).eql(404);
+        fetch(nodes[1].host + '/file/container/test/1.jpg').then(res => {
+          should(res.status).eql(404);
           utils.stopArchi(done);
-        });
+        }).catch(e => {
+          done(e);
+        })
       });
     });
 
@@ -33,12 +31,8 @@ describe('API GET : nodes down', () => {
         , ['start', '-c', path.join('..', 'configs', '101.json')]
         , ['start', '-c', path.join('..', 'configs', '200.json')]
       ], () => {
-        request({
-          base : nodes[0].host,
-          path : '/file/container/test/image.jpg',
-        }, (err, res) => {
-          should(err).not.ok();
-          should(res.statusCode).eql(200);
+        fetch(nodes[0].host + '/file/container/test/image.jpg').then(res => {
+          should(res.status).eql(200);
 
           let pathDir  = path.join(__dirname, 'datasets', 'get', 'data_100', '100-101-200', 'test');
           let filename = utils.getFileHash('image.jpg', config.HASH_SECRET);
@@ -48,7 +42,9 @@ describe('API GET : nodes down', () => {
             utils.deleteFolderRecursive(pathDir);
             utils.stopArchi(done);
           });
-        });
+        }).catch(e => {
+          done(e);
+        })
       });
     });
 
@@ -61,12 +57,8 @@ describe('API GET : nodes down', () => {
         , ['start', '-c', path.join('..', 'configs', '201.json')]
       ], () => {
 
-        request({
-          base : nodes[2].host,
-          path : '/file/container/test/image.jpg',
-        }, (err, res) => {
-          should(err).not.ok();
-          should(res.statusCode).eql(200);
+        fetch(nodes[2].host + '/file/container/test/image.jpg').then(res => {
+          should(res.status).eql(200);
 
           let pathDir = path.join(__dirname, 'datasets', 'get', 'data_200', '100-101-200', 'test');
           let filename = utils.getFileHash('image.jpg', config.HASH_SECRET);
@@ -76,7 +68,9 @@ describe('API GET : nodes down', () => {
             utils.deleteFolderRecursive(pathDir);
             utils.stopArchi(done);
           });
-        });
+        }).catch(e => {
+          done(e);
+        })
       });
     });
 
