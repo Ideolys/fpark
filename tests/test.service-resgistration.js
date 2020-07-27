@@ -10,57 +10,186 @@ let filePath = path.join(__dirname, 'datasets', 'service-registration', 'keys', 
 
 describe('Service registration', () => {
 
-  beforeEach(() => {
-    deleteFolderRecursive(path.join(__dirname, 'datasets', 'service-registration', 'keys'));
-    fs.mkdirSync(path.join(__dirname, 'datasets', 'service-registration', 'keys'));
-  });
+  describe('one node', () => {
 
-  before(done => {
-    runArchi('service-registration', [['start', '-c', path.join('..', 'configs', '100.json')]], done);
-  });
-
-  after(done => {
-    stopArchi(done);
-  })
-
-  it('should register the service', done => {
-    fetch(url, {
-      method  : 'POST',
-      headers : {
-        'Content-Type' : 'application/json'
-      },
-      body : JSON.stringify({
-        containerId : 123456789,
-        key         : '/* MY PUBLIC KEY */'
-      })
-    }).then(res => {
-      should(res.status).eql(200);
-      fs.readFile(filePath, (err, file) => {
-        should(err).not.ok();
-        should(file.toString()).eql('/* MY PUBLIC KEY */');
-        done();
-      })
-    }).catch(e => {
-      done(e);
+    beforeEach(() => {
+      deleteFolderRecursive(path.join(__dirname, 'datasets', 'service-registration', 'keys'));
+      fs.mkdirSync(path.join(__dirname, 'datasets', 'service-registration', 'keys'));
     });
+
+    before(done => {
+      runArchi('service-registration', [['start', '-c', path.join('..', 'configs', '100-service-registration-one-node.json')]], done);
+    });
+
+    after(done => {
+      stopArchi(done);
+    });
+
+    it('should register the service', done => {
+      fetch(url, {
+        method  : 'POST',
+        headers : {
+          'Content-Type' : 'application/json'
+        },
+        body : JSON.stringify({
+          containerId : 123456789,
+          key         : '/* MY PUBLIC KEY */'
+        })
+      }).then(res => {
+        should(res.status).eql(200);
+        fs.readFile(filePath, (err, file) => {
+          should(err).not.ok();
+          should(file.toString()).eql('/* MY PUBLIC KEY */');
+          done();
+        })
+      }).catch(e => {
+        done(e);
+      });
+    });
+
+    it('should register the service if the key already exist', done => {
+      fetch(url, {
+        method  : 'POST',
+        headers : {
+          'Content-Type' : 'application/json'
+        },
+        body : JSON.stringify({
+          containerId : 123456789,
+          key         : '/* MY PUBLIC KEY */'
+        })
+      }).then(res => {
+        should(res.status).eql(200);
+        fs.readFile(filePath, (err, file) => {
+          should(err).not.ok();
+          should(file.toString()).eql('/* MY PUBLIC KEY */');
+
+          fetch(url, {
+            method  : 'POST',
+            headers : {
+              'Content-Type' : 'application/json'
+            },
+            body : JSON.stringify({
+              containerId : 123456789,
+              key         : '/* MY PUBLIC KEY */'
+            })
+          }).then(res => {
+            should(res.status).eql(200);
+            done();
+          }).catch(e => {
+            done(e);
+          });
+
+        })
+      }).catch(e => {
+        done(e);
+      });
+    });
+
+    it('should not register the service if it is not json : no header', done => {
+      fetch(url, {
+        method  : 'POST',
+        body : JSON.stringify({
+          containerId : 123456789,
+          key         : '/* MY PUBLIC KEY */'
+        })
+      }).then(res => {
+        should(res.status).eql(400);
+        fs.access(filePath, (err) => {
+          should(err).ok();
+          done();
+        });
+      }).catch(e => {
+        done(e);
+      })
+    });
+
+    it('should not register the service if it is not json : not json in body', done => {
+      fetch(url, {
+        method  : 'POST',
+        headers : {
+          'Content-Type' : 'application/json'
+        },
+        body : 'test'
+      }).then(res => {
+          should(res.status).eql(500);
+          fs.access(filePath, (err) => {
+            should(err).ok();
+            done();
+          });
+      }).catch(e => {
+        done(e);
+      })
+    });
+
+    it('should not register the service if there is no body', done => {
+      fetch(url, {
+        method  : 'POST',
+        headers : {
+          'Content-Type' : 'application/json'
+        }
+      }).then(res => {
+        should(res.status).eql(500);
+        fs.access(filePath, (err) => {
+          should(err).ok();
+          done();
+        });
+      }).catch(e => {
+        done(e);
+      });
+    });
+
+    it('should not register the service if the body has not containerID', done => {
+      fetch(url, {
+        method  : 'POST',
+        headers : {
+          'Content-Type' : 'application/json'
+        },
+        body : JSON.stringify({
+          key         : '/* MY PUBLIC KEY */'
+        })
+      }).then(res => {
+        should(res.status).eql(400);
+        fs.access(filePath, (err) => {
+          should(err).ok();
+          done();
+        });
+      }).catch(e => {
+        done(e);
+      })
+    });
+
+    it('should not register the service if the body has not key', done => {
+      fetch(url, {
+        method  : 'POST',
+        headers : {
+          'Content-Type' : 'application/json'
+        },
+          body : JSON.stringify({
+            containerId : 123456789
+          })
+        }).then(res => {
+          should(res.status).eql(400);
+          fs.access(filePath, (err) => {
+            should(err).ok();
+            done();
+          });
+      }).catch(e => {
+        done(e);
+      })
+    });
+
   });
 
-  it('should not register the service if the key already exist', done => {
-    fetch(url, {
-      method  : 'POST',
-      headers : {
-        'Content-Type' : 'application/json'
-      },
-      body : JSON.stringify({
-        containerId : 123456789,
-        key         : '/* MY PUBLIC KEY */'
-      })
-    }).then(res => {
-      should(res.status).eql(200);
-      fs.readFile(filePath, (err, file) => {
-        should(err).not.ok();
-        should(file.toString()).eql('/* MY PUBLIC KEY */');
+  describe('multiple nodes', () => {
 
+    it('should register the service on each nodes', done => {
+      deleteFolderRecursive(path.join(__dirname, 'datasets', 'service-registration', 'keys'));
+      deleteFolderRecursive(path.join(__dirname, 'datasets', 'service-registration', 'keys_101'));
+
+      runArchi('service-registration', [
+        ['start', '-c', path.join('..', 'configs', '100-service-registration.json')],
+        ['start', '-c', path.join('..', 'configs', '101-service-registration.json')]
+      ], () => {
         fetch(url, {
           method  : 'POST',
           headers : {
@@ -71,108 +200,68 @@ describe('Service registration', () => {
             key         : '/* MY PUBLIC KEY */'
           })
         }).then(res => {
-          should(res.status).eql(409);
-          done();
+          should(res.status).eql(200);
+
+          let filePath100 = path.join(__dirname, 'datasets', 'service-registration', 'keys', '123456789.pub');
+          let filePath101 = path.join(__dirname, 'datasets', 'service-registration', 'keys_101', '123456789.pub');
+
+          fs.readFile(filePath100, (err, file) => {
+            should(err).not.ok();
+            should(file.toString()).eql('/* MY PUBLIC KEY */');
+
+            deleteFolderRecursive(path.join(__dirname, 'datasets', 'service-registration', 'keys'));
+
+            fs.readFile(filePath101, (err, file) => {
+              should(err).not.ok();
+              should(file.toString()).eql('/* MY PUBLIC KEY */');
+
+              deleteFolderRecursive(path.join(__dirname, 'datasets', 'service-registration', 'keys_101'));
+              stopArchi(done);
+            });
+          });
         }).catch(e => {
           done(e);
         });
-
-      })
-    }).catch(e => {
-      done(e);
+      });
     });
-  });
 
-  it('should not register the service if it is not json : no header', done => {
-    fetch(url, {
-      method  : 'POST',
-      body : JSON.stringify({
-        containerId : 123456789,
-        key         : '/* MY PUBLIC KEY */'
-      })
-    }).then(res => {
-      should(res.status).eql(400);
-      fs.access(filePath, (err) => {
-        should(err).ok();
-        done();
-      });
-    }).catch(e => {
-      done(e);
-    })
-  });
+    it('should fail if a node is not running', done => {
+      deleteFolderRecursive(path.join(__dirname, 'datasets', 'service-registration', 'keys'));
 
-  it('should not register the service if it is not json : not json in body', done => {
-    fetch(url, {
-      method  : 'POST',
-      headers : {
-        'Content-Type' : 'application/json'
-      },
-      body : 'test'
-    }).then(res => {
-        should(res.status).eql(500);
-        fs.access(filePath, (err) => {
-          should(err).ok();
-          done();
+      runArchi('service-registration', [
+        ['start', '-c', path.join('..', 'configs', '100-service-registration.json')],
+      ], () => {
+        fetch(url, {
+          method  : 'POST',
+          headers : {
+            'Content-Type' : 'application/json'
+          },
+          body : JSON.stringify({
+            containerId : 123456789,
+            key         : '/* MY PUBLIC KEY */'
+          })
+        }).then(res => {
+          should(res.status).eql(500);
+
+          let filePath100 = path.join(__dirname, 'datasets', 'service-registration', 'keys', '123456789.pub');
+          let filePath101 = path.join(__dirname, 'datasets', 'service-registration', 'keys_101', '123456789.pub');
+
+          fs.readFile(filePath100, (err, file) => {
+            should(err).not.ok();
+            should(file.toString()).eql('/* MY PUBLIC KEY */');
+
+            deleteFolderRecursive(path.join(__dirname, 'datasets', 'service-registration', 'keys'));
+
+            fs.access(filePath101, fs.constants.F_OK, err => {
+              should(err).ok();
+              stopArchi(done);
+            });
+          });
+        }).catch(e => {
+          done(e);
         });
-     }).catch(e => {
-       done(e);
-     })
-  });
-
-  it('should not register the service if there is no body', done => {
-    fetch(url, {
-      method  : 'POST',
-      headers : {
-        'Content-Type' : 'application/json'
-      }
-    }).then(res => {
-      should(res.status).eql(500);
-      fs.access(filePath, (err) => {
-        should(err).ok();
-        done();
       });
-    }).catch(e => {
-      done(e);
     });
-  });
 
-  it('should not register the service if the body has not containerID', done => {
-    fetch(url, {
-      method  : 'POST',
-      headers : {
-        'Content-Type' : 'application/json'
-      },
-      body : JSON.stringify({
-        key         : '/* MY PUBLIC KEY */'
-      })
-    }).then(res => {
-      should(res.status).eql(400);
-      fs.access(filePath, (err) => {
-        should(err).ok();
-        done();
-      });
-    }).catch(e => {
-      done(e);
-    })
-  });
-
-  it('should not register the service if the body has not key', done => {
-    fetch(url, {
-      method  : 'POST',
-      headers : {
-        'Content-Type' : 'application/json'
-      },
-        body : JSON.stringify({
-          containerId : 123456789
-        })
-      }).then(res => {
-        should(res.status).eql(400);
-        fs.access(filePath, (err) => {
-          should(err).ok();
-          done();
-        });
-     }).catch(e => {
-       done(e);
-     })
   });
 });
