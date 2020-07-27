@@ -45,6 +45,44 @@ describe('Service registration', () => {
     });
   });
 
+  it('should not register the service if the key already exist', done => {
+    fetch(url, {
+      method  : 'POST',
+      headers : {
+        'Content-Type' : 'application/json'
+      },
+      body : JSON.stringify({
+        containerId : 123456789,
+        key         : '/* MY PUBLIC KEY */'
+      })
+    }).then(res => {
+      should(res.status).eql(200);
+      fs.readFile(filePath, (err, file) => {
+        should(err).not.ok();
+        should(file.toString()).eql('/* MY PUBLIC KEY */');
+
+        fetch(url, {
+          method  : 'POST',
+          headers : {
+            'Content-Type' : 'application/json'
+          },
+          body : JSON.stringify({
+            containerId : 123456789,
+            key         : '/* MY PUBLIC KEY */'
+          })
+        }).then(res => {
+          should(res.status).eql(409);
+          done();
+        }).catch(e => {
+          done(e);
+        });
+
+      })
+    }).catch(e => {
+      done(e);
+    });
+  });
+
   it('should not register the service if it is not json : no header', done => {
     fetch(url, {
       method  : 'POST',
