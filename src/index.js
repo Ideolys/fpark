@@ -1,4 +1,3 @@
-const path    = require('path');
 const http    = require('http');
 const cluster = require('cluster');
 const os      = require('os');
