@@ -23,6 +23,62 @@ describe('API PUT', () => {
         utils.stopArchi(done);
       });
 
+      it('should not upload a file if no token is provided', done => {
+        let formData = new FormData();
+        formData.append('file', fs.createReadStream(path.join(__dirname, 'datasets', '_documents', 'file.txt')));
+
+        let headers = {};
+
+        fetch(nodes[1].host + '/file/container/test/file.txt', {
+          method  : 'PUT',
+          body    : formData,
+          headers
+        }).then(res => {
+          should(res.status).eql(401);
+          done();
+        }).catch(err => {
+          done(err);
+        });
+      });
+
+      it('should not upload a file if the token is invalid', done => {
+        let formData = new FormData();
+        formData.append('file', fs.createReadStream(path.join(__dirname, 'datasets', '_documents', 'file.txt')));
+
+        let headers = {};
+        utils.setJWTHeader(headers, 'test', path.join(__dirname, 'datasets', '_keys', 'key_2.pem'));
+
+        fetch(nodes[1].host + '/file/container/test/file.txt', {
+          method  : 'PUT',
+          body    : formData,
+          headers
+        }).then(res => {
+          should(res.status).eql(401);
+          done();
+        }).catch(err => {
+          done(err);
+        });
+      });
+
+      it('should not upload a file to an unregistered container', done => {
+        let formData = new FormData();
+        formData.append('file', fs.createReadStream(path.join(__dirname, 'datasets', '_documents', 'file.txt')));
+
+        let headers = {};
+        utils.setJWTHeader(headers, 'test', path.join(__dirname, 'datasets', '_keys', 'key_2.pem'));
+
+        fetch(nodes[1].host + '/file/container/test_2/file.txt', {
+          method  : 'PUT',
+          body    : formData,
+          headers
+        }).then(res => {
+          should(res.status).eql(401);
+          done();
+        }).catch(err => {
+          done(err);
+        });
+      });
+
       it('should upload a file & replicate', done => {
         let formData = new FormData();
         formData.append('file', fs.createReadStream(path.join(__dirname, 'datasets', '_documents', 'file.txt')));
