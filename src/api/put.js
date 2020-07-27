@@ -27,7 +27,17 @@ const {
 const imageUtils    = require('../commons/image/utils');
 const imageCompress = require('../commons/image/compress');
 const imageResize   = require('../commons/image/resize');
+const auth = require('../commons/auth');
 
+/**
+ * PUT a file
+ * @param {Stream} fileStream
+ * @param {Object} params { id, containerId }
+ * @param {Object} store { CONFIG }
+ * @param {String} keyNodes 'node1-node2-ndoeN'
+ * @param {Boolean/String} isFromAnotherNode is request from another node
+ * @param {Function} callback
+ */
 function putFile (fileStream, params, store, keyNodes, isFromAnotherNode, callback) {
   let pathDisk = path.join(store.CONFIG.FILE_DIRECTORY, keyNodes);
   createDirIfNotExists(pathDisk, err => {
@@ -87,113 +97,124 @@ function putFile (fileStream, params, store, keyNodes, isFromAnotherNode, callba
 
 exports.putFile = putFile;
 
+/**
+ * PUT API
+ * @param {Object} req
+ * @param {Object} res
+ * @param {Object} params { id, containerId }
+ * @param {Object} store { CONFIG }
+ */
 exports.putApi = function put (req, res, params, store) {
-  let nodes            = repartition.getNodesToPersistTo(params.id, store.CONFIG.NODES);
-  let isAllowedToWrite = repartition.isCurrentNodeInPersistentNodes(nodes, store.CONFIG.ID);
+  auth.verify(req, res, params, () => {
+    let nodes            = repartition.getNodesToPersistTo(params.id, store.CONFIG.NODES);
+    let isAllowedToWrite = repartition.isCurrentNodeInPersistentNodes(nodes, store.CONFIG.ID);
 
-  if (!isAllowedToWrite) {
-    if (getHeaderNthNode(req.headers) === 3) {
-      return respond(res, 500);
-    }
-
-    return queue(nodes, (node, next) => {
-      if (node.id === store.CONFIG.ID) {
-        return next();
-      }
-
-      let proxy = proxyFactory(() => {
-        return respond(res, 500);
-      });
-
-      let headers = {};
-      setHeaderNthNode(headers, req.headers);
-      setHeaderCurrentNode(headers, store.CONFIG.ID);
-
-      proxy(req, res, {
-        selfHandleResponse : true,
-        target             : node.host,
-        headers
-      });
-    }, () => {
-      respond(res, 500);
-    });
-  }
-
-  let keyNodes = repartition.flattenNodes(nodes);
-
-  let busboy = null;
-  try {
-    busboy = new Busboy({
-      headers : req.headers,
-      limits  : {
-        fileSize : store.CONFIG.MAX_FILE_SIZE,
-      }
-    });
-  }
-  catch (e) {
-    return respond(res, 500);
-  }
-
-  busboy.on('file', (fieldname, fileStream, filename, encoding, mimetype) => {
-    if (!filename) {
-      return respond(res, 500);
-    }
-
-    /**
-     * File size reached
-     * https://github.com/mscdex/busboy/blob/967fce0db075cb02765814db3e322d4f64d33a42/lib/types/multipart.js#L221
-     */
-    fileStream.on('limit', () => {
-      return respond(res, 413);
-    });
-
-    putFile(fileStream, params, store, keyNodes, getHeaderReplication(req.headers), (err) => {
-      if (err) {
+    if (!isAllowedToWrite) {
+      if (getHeaderNthNode(req.headers) === 3) {
         return respond(res, 500);
       }
 
-      if (getHeaderFromNode(req.headers)) {
-        return respond(res, 200);
-      }
-
-      let headers =  {};
-      setHeaderCurrentNode(headers, store.CONFIG.ID);
-      setHeaderReplication(headers, store.CONFIG.ID)
-
-      queue(nodes, (node, next) => {
+      return queue(nodes, (node, next) => {
         if (node.id === store.CONFIG.ID) {
           return next();
         }
 
-        let form    = new FormData();
-        let streams = file.getFilePath(store.CONFIG, keyNodes, params).path;
-        form.append('file', fs.createReadStream(streams));
+        let proxy = proxyFactory(() => {
+          return respond(res, 500);
+        });
 
-        Object.assign(headers, form.getHeaders());
+        let headers = {};
         setHeaderNthNode(headers, req.headers);
+        setHeaderCurrentNode(headers, store.CONFIG.ID);
 
-        fetch(node.host + req.url, {
-          method : 'PUT',
-          body   : form,
+        proxy(req, res, {
+          selfHandleResponse : true,
+          target             : node.host,
           headers
-        }).then(resFetch => {
-          if (resFetch.status !== 200) {
-            return next();
-          }
-
-          respond(res, 200);
-        }).catch(() => {
-          next();
-        })
+        });
       }, () => {
         respond(res, 500);
       });
+    }
+
+    let keyNodes = repartition.flattenNodes(nodes);
+
+    let busboy = null;
+    try {
+      busboy = new Busboy({
+        headers : req.headers,
+        limits  : {
+          fileSize : store.CONFIG.MAX_FILE_SIZE,
+        }
+      });
+    }
+    catch (e) {
+      return respond(res, 500);
+    }
+
+    busboy.on('file', (fieldname, fileStream, filename, encoding, mimetype) => {
+      if (!filename) {
+        return respond(res, 500);
+      }
+
+      /**
+       * File size reached
+       * https://github.com/mscdex/busboy/blob/967fce0db075cb02765814db3e322d4f64d33a42/lib/types/multipart.js#L221
+       */
+      fileStream.on('limit', () => {
+        return respond(res, 413);
+      });
+
+      putFile(fileStream, params, store, keyNodes, getHeaderReplication(req.headers), (err) => {
+        if (err) {
+          return respond(res, 500);
+        }
+
+        if (getHeaderFromNode(req.headers)) {
+          return respond(res, 200);
+        }
+
+        let headers =  {
+          'authorization' : req.headers.authorization
+        };
+        setHeaderCurrentNode(headers, store.CONFIG.ID);
+        setHeaderReplication(headers, store.CONFIG.ID)
+
+        queue(nodes, (node, next) => {
+          if (node.id === store.CONFIG.ID) {
+            return next();
+          }
+
+          let form    = new FormData();
+          let streams = file.getFilePath(store.CONFIG, keyNodes, params).path;
+          form.append('file', fs.createReadStream(streams));
+
+          Object.assign(headers, form.getHeaders());
+          setHeaderNthNode(headers, req.headers);
+
+          fetch(node.host + req.url, {
+            method : 'PUT',
+            body   : form,
+            headers
+          }).then(resFetch => {
+            if (resFetch.status !== 200) {
+              return next();
+            }
+
+            respond(res, 200);
+          }).catch(() => {
+            next();
+          })
+        }, () => {
+          respond(res, 500);
+        });
+      });
     });
-  });
 
-  busboy.on('error' , err => {
-    respond(res, 500);
-  });
+    busboy.on('error' , err => {
+      respond(res, 500);
+    });
 
-  req.pipe(busboy);
+    req.pipe(busboy);
+  });
 }

@@ -5,8 +5,6 @@
   "NODES"           : [
       { "id" : 100, "host" : "http://localhost:6000" }
     , { "id" : 101, "host" : "http://localhost:6001" }
-    , { "id" : 200, "host" : "http://localhost:6002" }
-    , { "id" : 201, "host" : "http://localhost:6003" }
   ],
   "FILE_DIRECTORY": "data_101",
   "HASH_SECRET" : "test",

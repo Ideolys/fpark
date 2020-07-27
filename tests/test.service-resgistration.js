@@ -6,15 +6,15 @@ const config = require('./datasets/configs/100.json');
 const { runArchi, stopArchi, deleteFolderRecursive } = require('./utils');
 
 let url      = config.NODES[0].host + '/node/register';
-let filePath = path.join(__dirname, 'datasets', 'service-registration', 'keys', '123456789.pub');
+let filePath = path.join(__dirname, 'datasets', 'service-registration', 'keys_100', '123456789.pub');
 
 describe('Service registration', () => {
 
   describe('one node', () => {
 
     beforeEach(() => {
-      deleteFolderRecursive(path.join(__dirname, 'datasets', 'service-registration', 'keys'));
-      fs.mkdirSync(path.join(__dirname, 'datasets', 'service-registration', 'keys'));
+      deleteFolderRecursive(path.join(__dirname, 'datasets', 'service-registration', 'keys_100'));
+      fs.mkdirSync(path.join(__dirname, 'datasets', 'service-registration', 'keys_100'));
     });
 
     before(done => {
@@ -183,7 +183,7 @@ describe('Service registration', () => {
   describe('multiple nodes', () => {
 
     it('should register the service on each nodes', done => {
-      deleteFolderRecursive(path.join(__dirname, 'datasets', 'service-registration', 'keys'));
+      deleteFolderRecursive(path.join(__dirname, 'datasets', 'service-registration', 'keys_100'));
       deleteFolderRecursive(path.join(__dirname, 'datasets', 'service-registration', 'keys_101'));
 
       runArchi('service-registration', [
@@ -202,14 +202,14 @@ describe('Service registration', () => {
         }).then(res => {
           should(res.status).eql(200);
 
-          let filePath100 = path.join(__dirname, 'datasets', 'service-registration', 'keys', '123456789.pub');
+          let filePath100 = path.join(__dirname, 'datasets', 'service-registration', 'keys_100', '123456789.pub');
           let filePath101 = path.join(__dirname, 'datasets', 'service-registration', 'keys_101', '123456789.pub');
 
           fs.readFile(filePath100, (err, file) => {
             should(err).not.ok();
             should(file.toString()).eql('/* MY PUBLIC KEY */');
 
-            deleteFolderRecursive(path.join(__dirname, 'datasets', 'service-registration', 'keys'));
+            deleteFolderRecursive(path.join(__dirname, 'datasets', 'service-registration', 'keys_100'));
 
             fs.readFile(filePath101, (err, file) => {
               should(err).not.ok();
@@ -226,7 +226,7 @@ describe('Service registration', () => {
     });
 
     it('should fail if a node is not running', done => {
-      deleteFolderRecursive(path.join(__dirname, 'datasets', 'service-registration', 'keys'));
+      deleteFolderRecursive(path.join(__dirname, 'datasets', 'service-registration', 'keys_100'));
 
       runArchi('service-registration', [
         ['start', '-c', path.join('..', 'configs', '100-service-registration.json')],
@@ -243,14 +243,14 @@ describe('Service registration', () => {
         }).then(res => {
           should(res.status).eql(500);
 
-          let filePath100 = path.join(__dirname, 'datasets', 'service-registration', 'keys', '123456789.pub');
+          let filePath100 = path.join(__dirname, 'datasets', 'service-registration', 'keys_100', '123456789.pub');
           let filePath101 = path.join(__dirname, 'datasets', 'service-registration', 'keys_101', '123456789.pub');
 
           fs.readFile(filePath100, (err, file) => {
             should(err).not.ok();
             should(file.toString()).eql('/* MY PUBLIC KEY */');
 
-            deleteFolderRecursive(path.join(__dirname, 'datasets', 'service-registration', 'keys'));
+            deleteFolderRecursive(path.join(__dirname, 'datasets', 'service-registration', 'keys_100'));
 
             fs.access(filePath101, fs.constants.F_OK, err => {
               should(err).ok();

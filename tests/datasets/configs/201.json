@@ -9,6 +9,7 @@
     , { "id" : 201, "host" : "http://localhost:6003" }
   ],
   "FILE_DIRECTORY": "data_201",
+  "KEYS_DIRECTORY" : "keys_201",
   "HASH_SECRET" : "test",
   "ENCRYPTION_IV"        : "srp9zyldyxdzmddx",
   "ENCRYPTION_IV_LENGTH" : 16,

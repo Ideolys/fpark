@@ -20,9 +20,13 @@ describe('API PUT - nodes down', () => {
           let formData = new FormData();
           formData.append('file', fs.createReadStream(path.join(__dirname, 'datasets', '_documents', 'file.txt')));
 
+          let headers = {};
+          utils.setJWTHeader(headers, 'test', path.join(__dirname, 'datasets', '_keys', 'test.pem'));
+
           fetch(nodes[1].host + '/file/container/test/file.txt', {
             method  : 'PUT',
-            body    : formData
+            body    : formData,
+            headers
           }).then(res => {
             should(res.status).eql(200);
 

@@ -27,9 +27,13 @@ describe('API PUT', () => {
         let formData = new FormData();
         formData.append('file', fs.createReadStream(path.join(__dirname, 'datasets', '_documents', 'file.txt')));
 
+        let headers = {};
+        utils.setJWTHeader(headers, 'test', path.join(__dirname, 'datasets', '_keys', 'test.pem'));
+
         fetch(nodes[1].host + '/file/container/test/file.txt', {
           method  : 'PUT',
-          body    : formData
+          body    : formData,
+          headers
         }).then(res => {
           should(res.status).eql(200);
 
@@ -55,9 +59,13 @@ describe('API PUT', () => {
         let formData = new FormData();
         formData.append('file', fs.createReadStream(path.join(__dirname, 'datasets', '_documents', 'file.txt')));
 
+        let headers = {};
+        utils.setJWTHeader(headers, 'test', path.join(__dirname, 'datasets', '_keys', 'test.pem'));
+
         fetch(nodes[0].host + '/file/container/test/file.txt', {
           method  : 'PUT',
-          body    : formData
+          body    : formData,
+          headers
         }).then(res => {
           should(res.status).eql(200);
 
@@ -82,9 +90,13 @@ describe('API PUT', () => {
         let formData = new FormData();
         formData.append('file', fs.createReadStream(path.join(__dirname, 'datasets', '_documents', 'file.txt')));
 
+        let headers = {};
+        utils.setJWTHeader(headers, 'test', path.join(__dirname, 'datasets', '_keys', 'test.pem'));
+
         fetch(nodes[1].host + '/file/container/test/file.txt', {
           method  : 'PUT',
-          body    : formData
+          body    : formData,
+          headers
         }).then(res => {
           should(res.status).eql(200);
 
@@ -147,9 +159,14 @@ describe('API PUT', () => {
         let formData = new FormData();
         formData.append('file', fs.createReadStream(path.join(__dirname, 'datasets', '_documents', 'image.jpg')));
 
+
+        let headers = {};
+        utils.setJWTHeader(headers, 'test', path.join(__dirname, 'datasets', '_keys', 'test.pem'));
+
         fetch(nodes[1].host + '/file/container/test/image.jpg', {
           method  : 'PUT',
-          body    : formData
+          body    : formData,
+          headers
         }).then(res => {
           should(res.status).eql(200);
 
@@ -178,9 +195,13 @@ describe('API PUT', () => {
         let formData = new FormData();
         formData.append('file', fs.createReadStream(pathFile));
 
+        let headers = {};
+        utils.setJWTHeader(headers, 'test', path.join(__dirname, 'datasets', '_keys', 'test.pem'));
+
         fetch(nodes[1].host + '/file/container/test/' + filenameOriginal, {
           method  : 'PUT',
-          body    : formData
+          body    : formData,
+          headers
         }).then(res => {
           should(res.status).eql(200);
 
@@ -232,9 +253,13 @@ describe('API PUT', () => {
         let formData = new FormData();
         formData.append('file', fs.createReadStream(pathFile));
 
+        let headers = {};
+        utils.setJWTHeader(headers, 'test', path.join(__dirname, 'datasets', '_keys', 'test.pem'));
+
         fetch(nodes[1].host + '/file/container/test/' + filenameOriginal, {
           method  : 'PUT',
-          body    : formData
+          body    : formData,
+          headers
         }).then(res => {
           should(res.status).eql(200);
 
@@ -286,9 +311,13 @@ describe('API PUT', () => {
         let formData = new FormData();
         formData.append('file', fs.createReadStream(pathFile));
 
+        let headers = {};
+        utils.setJWTHeader(headers, 'test', path.join(__dirname, 'datasets', '_keys', 'test.pem'));
+
         fetch(nodes[1].host + '/file/container/test/' + filenameOriginal, {
           method  : 'PUT',
-          body    : formData
+          body    : formData,
+          headers
         }).then(res => {
           should(res.status).eql(200);
 
@@ -340,10 +369,13 @@ describe('API PUT', () => {
         let formData = new FormData();
         formData.append('file', fs.createReadStream(pathFile));
 
+        let headers = formData.getHeaders();
+        utils.setJWTHeader(headers, 'test', path.join(__dirname, 'datasets', '_keys', 'test.pem'));
+
         fetch(nodes[1].host + '/file/container/test/' + filenameOriginal, {
           method  : 'PUT',
           body    : formData,
-          headers : formData.getHeaders()
+          headers
         }).then(res => {
           should(res.status).eql(200);
 
@@ -392,9 +424,13 @@ describe('API PUT', () => {
         let formData = new FormData();
         formData.append('file', fs.createReadStream(pathFile));
 
+        let headers = {};
+        utils.setJWTHeader(headers, 'test', path.join(__dirname, 'datasets', '_keys', 'test.pem'));
+
         fetch(nodes[1].host + '/file/container/test/' + filenameOriginal, {
           method  : 'PUT',
-          body    : formData
+          body    : formData,
+          headers
         }).then(res => {
           should(res.status).eql(200);
 
@@ -448,9 +484,13 @@ describe('API PUT', () => {
           let formData = new FormData();
           formData.append('file', fs.createReadStream(path.join(__dirname, 'datasets', '_documents', file)));
 
+          let headers = {};
+          utils.setJWTHeader(headers, 'test', path.join(__dirname, 'datasets', '_keys', 'test.pem'));
+
           fetch(nodes[0].host + '/file/container/test/' + file, {
             method : 'PUT',
-            body   : formData
+            body   : formData,
+            headers
           }).then(res => {
             should(res.status).eql(413);
             utils.stopArchi(done);

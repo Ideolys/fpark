@@ -128,6 +128,7 @@ module.exports = {
           }
 
           keys[_filename] = file.toString();
+          next();
         });
       }, callback);
     });

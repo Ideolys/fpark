@@ -2,11 +2,10 @@ const path      = require('path');
 const fs        = require('fs');
 const spawn     = require('child_process').spawn;
 const { queue } = require('../src/commons/utils');
-const utils = require('../src/commons/utils');
+const jwt       = require('jsonwebtoken');
 
 const encryption = require('../src/commons/encryption');
 const file       = require('../src/commons/file');
-const { hash } = require('../src/commons/repartition');
 
 let tempFolderPath = path.join(__dirname, '.temp');
 let pidsFilePath   = path.join(tempFolderPath, 'pids');
@@ -82,7 +81,7 @@ function runArchi (dataset, nodes, callback) {
   }
 
   killPreviousPids();
-  utils.queue(nodes, (node, next) => {
+  queue(nodes, (node, next) => {
     execute(node, dataset, next);
   }, callback);
 }
@@ -96,10 +95,25 @@ function getFileHash (str, secret) {
   return encryption.hash(filename, secret);
 }
 
+
+function setJWTHeader (headers, containerId, keyPath) {
+  let _token = jwt.sign(
+    {
+      iss : containerId,
+      aud : containerId
+    },
+    fs.readFileSync(keyPath, 'utf8'),
+    { algorithm : 'ES512' }
+  );
+
+  headers.authorization = 'Bearer ' + _token;
+}
+
 exports.execute               = execute;
 exports.stopExecute           = stopExecute;
 exports.deleteFolderRecursive = deleteFolderRecursive;
 exports.getFileHash           = getFileHash;
+exports.setJWTHeader          = setJWTHeader;
 
 exports.runArchi  = runArchi;
 exports.stopArchi = stopArchi;
