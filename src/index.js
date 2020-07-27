@@ -1,4 +1,5 @@
 const http    = require('http');
+const path    = require('path');
 const cluster = require('cluster');
 const os      = require('os');
 const numCPUs = os.cpus().length;
@@ -13,6 +14,7 @@ const kittenLogger = require('kitten-logger');
 const CONFIG       = require('./config');
 const logger       = require('./logger');
 const utils        = require('./commons/utils');
+const auth         = require('./commons/auth');
 let server;
 
 /**
@@ -61,20 +63,27 @@ function runServer (config, callback) {
   }
 
   utils.createDirIfNotExistsSync(CONFIG.FILE_DIRECTORY);
+  utils.createDirIfNotExistsSync(CONFIG.KEYS_DIRECTORY);
 
   api(router, { CONFIG });
 
-  server = http.createServer((req, res) => {
-    logger(req, res);
-    router.lookup(req, res);
-  });
-
-  server.listen(CONFIG.SERVER_PORT, err => {
+  auth.loadKeys(path.join(process.cwd(), CONFIG.KEYS_DIRECTORY), err => {
     if (err) {
       throw err;
     }
 
-    console.log('Server listening on: http://localhost:' + CONFIG.SERVER_PORT);
+    server = http.createServer((req, res) => {
+      logger(req, res);
+      router.lookup(req, res);
+    });
+
+    server.listen(CONFIG.SERVER_PORT, err => {
+      if (err) {
+        throw err;
+      }
+
+      console.log('Server listening on: http://localhost:' + CONFIG.SERVER_PORT);
+    });
   });
 }
 

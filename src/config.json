@@ -4,6 +4,7 @@
   "NODES"           : [],
   "LOGS_DIRECTORY"  : "logs",
   "FILE_DIRECTORY"  : "data",
+  "KEYS_DIRECTORY"  : "keys",
 
   "ENCRYPTION_IV"        : "srp9zyldyxdzmddx",
   "ENCRYPTION_IV_LENGTH" : 16,
