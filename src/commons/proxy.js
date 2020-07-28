@@ -2,7 +2,7 @@ const httpProxy = require('http-proxy');
 const pump      = require('pump');
 
 module.exports = function factory (onErrorHandler) {
-  let proxy = httpProxy.createProxy({});
+  let proxy = httpProxy.createProxy({ xfwd : true });
 
   proxy.once('error', (err, req, res) => {
     proxy = null;
