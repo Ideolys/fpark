@@ -167,7 +167,7 @@ exports.putApi = function put (req, res, params, store) {
           return respond(res, 500);
         }
 
-        if (getHeaderFromNode(req.headers)) {
+        if (getHeaderFromNode(req.headers) && !req.headers['x-forwarded-for']) {
           return respond(res, 200);
         }
 

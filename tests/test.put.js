@@ -134,7 +134,13 @@ describe('API PUT', () => {
             fs.access(path.join(pathDir, 'test', filename + '.enc'), fs.constants.F_OK, err => {
               should(err).not.ok();
               utils.deleteFolderRecursive(pathDir);
-              done();
+
+              pathDir  = path.join(__dirname, 'datasets', 'put', 'data_200', '101-200-201');
+              fs.access(path.join(pathDir, 'test', filename + '.enc'), fs.constants.F_OK, err => {
+                should(err).not.ok();
+                utils.deleteFolderRecursive(pathDir);
+                done();
+              });
             });
           });
         }).catch(err => {
