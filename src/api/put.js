@@ -53,10 +53,8 @@ function putFile (fileStream, params, store, keyNodes, isFromAnotherNode, callba
         return callback(true);
       }
 
-      let filename     = file.getFileName(params.id, store.CONFIG.ENCRYPTION_IV_LENGTH);
-      let fileNameDisk = encryption.hash(filename, store.CONFIG.HASH_SECRET, store.CONFIG.HASH_ALGORITHM);
-
-      let extension           = path.extname(filename);
+      let filePath            = file.getFilePath(store.CONFIG, keyNodes, params);
+      let extension           = path.extname(params.id);
       let extensionWithoutDot = extension.replace('.', '');
       let isImage             = imageUtils.isImage(extensionWithoutDot);
 
@@ -64,9 +62,8 @@ function putFile (fileStream, params, store, keyNodes, isFromAnotherNode, callba
         extension = '.jpeg';
       }
 
-      let pathFile  = path.join(pathContainer, fileNameDisk + '.enc');
       let _pipeline = [
-        fs.createWriteStream(pathFile),
+        fs.createWriteStream(filePath.path),
         err => {
           if (err) {
             console.log('Write pipeline error', err);
@@ -78,7 +75,7 @@ function putFile (fileStream, params, store, keyNodes, isFromAnotherNode, callba
 
       if (isFromAnotherNode == null) {
         _pipeline.unshift(encryption.encryptStream(
-          filename,
+          filePath.filename,
           store.CONFIG.ENCRYPTION_IV,
           store.CONFIG.ENCRYPTION_ALGORITHM
         ));

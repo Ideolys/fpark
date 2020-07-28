@@ -91,8 +91,7 @@ function stopArchi (callback) {
 }
 
 function getFileHash (str, secret) {
-  let filename = file.getFileName(str, 16);
-  return encryption.hash(filename, secret);
+  return encryption.hash(str, secret);
 }
 
 

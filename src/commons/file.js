@@ -7,7 +7,7 @@ const encryption = require('../commons/encryption');
 module.exports = {
 
   /**
-   * Get filename of spe;cified length
+   * Get filename of specified length
    * @param {String} filename
    * @param {Int} length
    * @returns {String}
@@ -30,7 +30,7 @@ module.exports = {
   getFilePath (CONFIG, nodes, params) {
     let pathDisk     = path.resolve(path.join(CONFIG.FILE_DIRECTORY, nodes));
     let filename     = this.getFileName(params.id, CONFIG.ENCRYPTION_IV_LENGTH);
-    let filenameDisk = encryption.hash(filename, CONFIG.HASH_SECRET, CONFIG.HASH_ALGORITHM);
+    let filenameDisk = encryption.hash(params.id, CONFIG.HASH_SECRET, CONFIG.HASH_ALGORITHM);
     let filePath     = path.join(pathDisk, params.containerId, filenameDisk + '.enc');
 
     return { path : filePath, filename };
