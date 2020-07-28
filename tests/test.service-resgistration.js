@@ -32,8 +32,8 @@ describe('Service registration', () => {
           'Content-Type' : 'application/json'
         },
         body : JSON.stringify({
-          containerId : 123456789,
-          key         : '/* MY PUBLIC KEY */'
+          container : 123456789,
+          key       : '/* MY PUBLIC KEY */'
         })
       }).then(res => {
         should(res.status).eql(200);
@@ -54,8 +54,8 @@ describe('Service registration', () => {
           'Content-Type' : 'application/json'
         },
         body : JSON.stringify({
-          containerId : 123456789,
-          key         : '/* MY PUBLIC KEY */'
+          container : 123456789,
+          key       : '/* MY PUBLIC KEY */'
         })
       }).then(res => {
         should(res.status).eql(200);
@@ -69,8 +69,8 @@ describe('Service registration', () => {
               'Content-Type' : 'application/json'
             },
             body : JSON.stringify({
-              containerId : 123456789,
-              key         : '/* MY PUBLIC KEY */'
+              container : 123456789,
+              key       : '/* MY PUBLIC KEY */'
             })
           }).then(res => {
             should(res.status).eql(200);
@@ -89,8 +89,8 @@ describe('Service registration', () => {
       fetch(url, {
         method  : 'POST',
         body : JSON.stringify({
-          containerId : 123456789,
-          key         : '/* MY PUBLIC KEY */'
+          container : 123456789,
+          key       : '/* MY PUBLIC KEY */'
         })
       }).then(res => {
         should(res.status).eql(400);
@@ -138,7 +138,7 @@ describe('Service registration', () => {
       });
     });
 
-    it('should not register the service if the body has not containerID', done => {
+    it('should not register the service if the body has not container', done => {
       fetch(url, {
         method  : 'POST',
         headers : {
@@ -165,7 +165,7 @@ describe('Service registration', () => {
           'Content-Type' : 'application/json'
         },
           body : JSON.stringify({
-            containerId : 123456789
+            container : 123456789
           })
         }).then(res => {
           should(res.status).eql(400);
@@ -196,8 +196,8 @@ describe('Service registration', () => {
             'Content-Type' : 'application/json'
           },
           body : JSON.stringify({
-            containerId : 123456789,
-            key         : '/* MY PUBLIC KEY */'
+            container : 123456789,
+            key       : '/* MY PUBLIC KEY */'
           })
         }).then(res => {
           should(res.status).eql(200);
@@ -237,8 +237,8 @@ describe('Service registration', () => {
             'Content-Type' : 'application/json'
           },
           body : JSON.stringify({
-            containerId : 123456789,
-            key         : '/* MY PUBLIC KEY */'
+            container : 123456789,
+            key       : '/* MY PUBLIC KEY */'
           })
         }).then(res => {
           should(res.status).eql(500);

@@ -22,11 +22,11 @@ module.exports = function nodRegister (req, res, params, store) {
         return  respond(res, 400);
       }
 
-      if (!_body.containerId || !_body.key) {
+      if (!_body.container || !_body.key) {
         return respond(res, 400);
       }
 
-      fs.writeFile(path.join(store.CONFIG.KEYS_DIRECTORY, _body.containerId + '.pub'), _body.key, { flag : 'wx' }, (err) => {
+      fs.writeFile(path.join(store.CONFIG.KEYS_DIRECTORY, _body.container + '.pub'), _body.key, { flag : 'wx' }, (err) => {
         if (err) {
           if (err.code === 'EEXIST') {
             return respond(res, 200);
@@ -35,7 +35,7 @@ module.exports = function nodRegister (req, res, params, store) {
           return respond(res, 500);
         }
 
-        setKey(_body.containerId, _body.key);
+        setKey(_body.container, _body.key);
 
         if (getHeaderFromNode(req.headers)) {
           return respond(res, 200);
