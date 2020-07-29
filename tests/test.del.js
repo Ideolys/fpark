@@ -92,23 +92,23 @@ describe('DEL /file/container/:containerId/:id', () => {
       let sourcePath = path.join(__dirname, 'datasets', '_documents', 'file.txt');
       let filename   = getFileHash('file.txt', config.HASH_SECRET);
 
-      let filePath101 = path.join(__dirname, 'datasets', 'del', 'data_101','101-200-201', 'test', filename + '.enc');
-      let filePath200 = path.join(__dirname, 'datasets', 'del', 'data_200','101-200-201', 'test', filename + '.enc');
-      let filePath201 = path.join(__dirname, 'datasets', 'del', 'data_201','101-200-201', 'test', filename + '.enc');
+      let filePath101 = path.join(__dirname, 'datasets', 'del', 'data_100','100-101-201', 'test', filename + '.enc');
+      let filePath200 = path.join(__dirname, 'datasets', 'del', 'data_101','100-101-201', 'test', filename + '.enc');
+      let filePath201 = path.join(__dirname, 'datasets', 'del', 'data_201','100-101-201', 'test', filename + '.enc');
 
-      createDirIfNotExistsSync(path.join(__dirname, 'datasets', 'del', 'data_101', '101-200-201'));
-      createDirIfNotExistsSync(path.join(__dirname, 'datasets', 'del', 'data_200', '101-200-201'));
-      createDirIfNotExistsSync(path.join(__dirname, 'datasets', 'del', 'data_201', '101-200-201'));
+      createDirIfNotExistsSync(path.join(__dirname, 'datasets', 'del', 'data_100', '100-101-201'));
+      createDirIfNotExistsSync(path.join(__dirname, 'datasets', 'del', 'data_101', '100-101-201'));
+      createDirIfNotExistsSync(path.join(__dirname, 'datasets', 'del', 'data_201', '100-101-201'));
 
-      createDirIfNotExistsSync(path.join(__dirname, 'datasets', 'del', 'data_101', '101-200-201','test'));
-      createDirIfNotExistsSync(path.join(__dirname, 'datasets', 'del', 'data_200', '101-200-201','test'));
-      createDirIfNotExistsSync(path.join(__dirname, 'datasets', 'del', 'data_201', '101-200-201','test'));
+      createDirIfNotExistsSync(path.join(__dirname, 'datasets', 'del', 'data_100', '100-101-201','test'));
+      createDirIfNotExistsSync(path.join(__dirname, 'datasets', 'del', 'data_101', '100-101-201','test'));
+      createDirIfNotExistsSync(path.join(__dirname, 'datasets', 'del', 'data_201', '100-101-201','test'));
 
       fs.writeFileSync(filePath101, fs.readFileSync(sourcePath));
       fs.writeFileSync(filePath200, fs.readFileSync(sourcePath));
       fs.writeFileSync(filePath201, fs.readFileSync(sourcePath));
 
-      fetch(nodes[2].host + '/file/container/test/file.txt', {
+      fetch(nodes[1].host + '/file/container/test/file.txt', {
         method  : 'DELETE',
         headers
       }).then(res => {
@@ -135,17 +135,17 @@ describe('DEL /file/container/:containerId/:id', () => {
       let sourcePath = path.join(__dirname, 'datasets', '_documents', 'file.txt');
       let filename   = getFileHash('file.txt', config.HASH_SECRET);
 
-      let filePath101 = path.join(__dirname, 'datasets', 'del', 'data_101','101-200-201', 'test', filename + '.enc');
-      let filePath200 = path.join(__dirname, 'datasets', 'del', 'data_200','101-200-201', 'test', filename + '.enc');
-      let filePath201 = path.join(__dirname, 'datasets', 'del', 'data_201','101-200-201', 'test', filename + '.enc');
+      let filePath101 = path.join(__dirname, 'datasets', 'del', 'data_100','100-101-201', 'test', filename + '.enc');
+      let filePath200 = path.join(__dirname, 'datasets', 'del', 'data_101','100-101-201', 'test', filename + '.enc');
+      let filePath201 = path.join(__dirname, 'datasets', 'del', 'data_201','100-101-201', 'test', filename + '.enc');
 
-      createDirIfNotExistsSync(path.join(__dirname, 'datasets', 'del', 'data_101', '101-200-201'));
-      createDirIfNotExistsSync(path.join(__dirname, 'datasets', 'del', 'data_200', '101-200-201'));
-      createDirIfNotExistsSync(path.join(__dirname, 'datasets', 'del', 'data_201', '101-200-201'));
+      createDirIfNotExistsSync(path.join(__dirname, 'datasets', 'del', 'data_100', '100-101-201'));
+      createDirIfNotExistsSync(path.join(__dirname, 'datasets', 'del', 'data_101', '100-101-201'));
+      createDirIfNotExistsSync(path.join(__dirname, 'datasets', 'del', 'data_201', '100-101-201'));
 
-      createDirIfNotExistsSync(path.join(__dirname, 'datasets', 'del', 'data_101', '101-200-201','test'));
-      createDirIfNotExistsSync(path.join(__dirname, 'datasets', 'del', 'data_200', '101-200-201','test'));
-      createDirIfNotExistsSync(path.join(__dirname, 'datasets', 'del', 'data_201', '101-200-201','test'));
+      createDirIfNotExistsSync(path.join(__dirname, 'datasets', 'del', 'data_100', '100-101-201','test'));
+      createDirIfNotExistsSync(path.join(__dirname, 'datasets', 'del', 'data_101', '100-101-201','test'));
+      createDirIfNotExistsSync(path.join(__dirname, 'datasets', 'del', 'data_201', '100-101-201','test'));
 
       fs.writeFileSync(filePath101, fs.readFileSync(sourcePath));
       fs.writeFileSync(filePath200, fs.readFileSync(sourcePath));
@@ -188,14 +188,14 @@ describe('DEL /file/container/:containerId/:id', () => {
         let sourcePath = path.join(__dirname, 'datasets', '_documents', 'file.txt');
         let filename   = getFileHash('file.txt', config.HASH_SECRET);
 
-        let filePath101 = path.join(__dirname, 'datasets', 'del', 'data_101','101-200-201', 'test', filename + '.enc');
-        let filePath201 = path.join(__dirname, 'datasets', 'del', 'data_201','101-200-201', 'test', filename + '.enc');
+        let filePath101 = path.join(__dirname, 'datasets', 'del', 'data_101','100-101-201', 'test', filename + '.enc');
+        let filePath201 = path.join(__dirname, 'datasets', 'del', 'data_201','100-101-201', 'test', filename + '.enc');
 
-        createDirIfNotExistsSync(path.join(__dirname, 'datasets', 'del', 'data_101', '101-200-201'));
-        createDirIfNotExistsSync(path.join(__dirname, 'datasets', 'del', 'data_201', '101-200-201'));
+        createDirIfNotExistsSync(path.join(__dirname, 'datasets', 'del', 'data_101', '100-101-201'));
+        createDirIfNotExistsSync(path.join(__dirname, 'datasets', 'del', 'data_201', '100-101-201'));
 
-        createDirIfNotExistsSync(path.join(__dirname, 'datasets', 'del', 'data_101', '101-200-201','test'));
-        createDirIfNotExistsSync(path.join(__dirname, 'datasets', 'del', 'data_201', '101-200-201','test'));
+        createDirIfNotExistsSync(path.join(__dirname, 'datasets', 'del', 'data_101', '100-101-201','test'));
+        createDirIfNotExistsSync(path.join(__dirname, 'datasets', 'del', 'data_201', '100-101-201','test'));
 
         fs.writeFileSync(filePath101, fs.readFileSync(sourcePath));
         fs.writeFileSync(filePath201, fs.readFileSync(sourcePath));

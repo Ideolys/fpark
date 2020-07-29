@@ -25,7 +25,7 @@ const { verify }         = require('../commons/auth');
  */
 exports.delApi = function delApi (req, res, params, store) {
   verify(req, res, params, () => {
-    let nodes            = getNodesToPersistTo(params.id, store.CONFIG.NODES);
+    let nodes            = getNodesToPersistTo(params.id, store.CONFIG.NODES, store.CONFIG.REPLICATION_NB_REPLICAS);
     let isAllowedToWrite = isCurrentNodeInPersistentNodes(nodes, store.CONFIG.ID);
 
     if (!isAllowedToWrite) {

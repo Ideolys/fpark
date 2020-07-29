@@ -93,13 +93,13 @@ describe('API PUT', () => {
         }).then(res => {
           should(res.status).eql(200);
 
-          let pathDir  = path.join(__dirname, 'datasets', 'put', 'data_101', '101-200-201');
+          let pathDir  = path.join(__dirname, 'datasets', 'put', 'data_101', '100-101-201');
           let filename = utils.getFileHash('file.txt', config.HASH_SECRET);
           fs.access(path.join(pathDir, 'test', filename + '.enc'), fs.constants.F_OK, err => {
             should(err).not.ok();
             utils.deleteFolderRecursive(pathDir);
 
-            pathDir  = path.join(__dirname, 'datasets', 'put', 'data_200', '101-200-201');
+            pathDir  = path.join(__dirname, 'datasets', 'put', 'data_100', '100-101-201');
             fs.access(path.join(pathDir, 'test', filename + '.enc'), fs.constants.F_OK, err => {
               should(err).not.ok();
               utils.deleteFolderRecursive(pathDir);
@@ -118,29 +118,23 @@ describe('API PUT', () => {
         let headers = {};
         utils.setJWTHeader(headers, 'test', path.join(__dirname, 'datasets', '_keys', 'test.pem'));
 
-        fetch(nodes[0].host + '/file/container/test/file.txt', {
+        fetch(nodes[2].host + '/file/container/test/file.txt', {
           method  : 'PUT',
           body    : formData,
           headers
         }).then(res => {
           should(res.status).eql(200);
 
-          let pathDir  = path.join(__dirname, 'datasets', 'put', 'data_100', '101-200-201');
+          let pathDir  = path.join(__dirname, 'datasets', 'put', 'data_100', '100-101-201');
           let filename = utils.getFileHash('file.txt', config.HASH_SECRET);
           fs.access(path.join(pathDir, 'test', filename + '.enc'), fs.constants.F_OK, err => {
-            should(err).ok();
+            should(err).not.ok();
 
-            pathDir  = path.join(__dirname, 'datasets', 'put', 'data_101', '101-200-201');
+            pathDir  = path.join(__dirname, 'datasets', 'put', 'data_101', '100-101-201');
             fs.access(path.join(pathDir, 'test', filename + '.enc'), fs.constants.F_OK, err => {
               should(err).not.ok();
               utils.deleteFolderRecursive(pathDir);
-
-              pathDir  = path.join(__dirname, 'datasets', 'put', 'data_200', '101-200-201');
-              fs.access(path.join(pathDir, 'test', filename + '.enc'), fs.constants.F_OK, err => {
-                should(err).not.ok();
-                utils.deleteFolderRecursive(pathDir);
-                done();
-              });
+              done();
             });
           });
         }).catch(err => {
@@ -155,14 +149,14 @@ describe('API PUT', () => {
         let headers = {};
         utils.setJWTHeader(headers, 'test', path.join(__dirname, 'datasets', '_keys', 'test.pem'));
 
-        fetch(nodes[1].host + '/file/container/test/file.txt', {
+        fetch(nodes[0].host + '/file/container/test/file.txt', {
           method  : 'PUT',
           body    : formData,
           headers
         }).then(res => {
           should(res.status).eql(200);
 
-          let pathDir  = path.join(__dirname, 'datasets', 'put', 'data_101', '101-200-201');
+          let pathDir  = path.join(__dirname, 'datasets', 'put', 'data_100', '100-101-201');
           let filename = utils.getFileHash('file.txt', config.HASH_SECRET);
           let filePath = path.join(pathDir, 'test', filename + '.enc');
           fs.access(filePath, fs.constants.F_OK, err => {
@@ -180,7 +174,7 @@ describe('API PUT', () => {
             should(decrypted).eql('test\n');
             utils.deleteFolderRecursive(pathDir);
 
-            pathDir  = path.join(__dirname, 'datasets', 'put', 'data_200', '101-200-201');
+            pathDir  = path.join(__dirname, 'datasets', 'put', 'data_101', '100-101-201');
             filePath = path.join(pathDir, 'test', filename + '.enc');
             fs.access(filePath, fs.constants.F_OK, err => {
               should(err).not.ok();
@@ -318,14 +312,14 @@ describe('API PUT', () => {
         let headers = {};
         utils.setJWTHeader(headers, 'test', path.join(__dirname, 'datasets', '_keys', 'test.pem'));
 
-        fetch(nodes[1].host + '/file/container/test/' + filenameOriginal, {
+        fetch(nodes[0].host + '/file/container/test/' + filenameOriginal, {
           method  : 'PUT',
           body    : formData,
           headers
         }).then(res => {
           should(res.status).eql(200);
 
-          let pathDir  = path.join(__dirname, 'datasets', 'put', 'data_101', '100-101-200');
+          let pathDir  = path.join(__dirname, 'datasets', 'put', 'data_100', '100-200-201');
           let filename = utils.getFileHash(filenameOriginal, config.HASH_SECRET);
           let filePath = path.join(pathDir, 'test', filename + '.enc');
           fs.access(path.join(pathDir, 'test', filename + '.enc'), fs.constants.F_OK, err => {
@@ -343,7 +337,7 @@ describe('API PUT', () => {
 
             utils.deleteFolderRecursive(pathDir);
 
-            pathDir  = path.join(__dirname, 'datasets', 'put', 'data_100', '100-101-200');
+            pathDir  = path.join(__dirname, 'datasets', 'put', 'data_200', '100-200-201');
             filePath = path.join(pathDir, 'test', filename + '.enc');
             fs.access(path.join(pathDir, 'test', filename + '.enc'), fs.constants.F_OK, err => {
               should(err).not.ok();
@@ -376,14 +370,14 @@ describe('API PUT', () => {
         let headers = {};
         utils.setJWTHeader(headers, 'test', path.join(__dirname, 'datasets', '_keys', 'test.pem'));
 
-        fetch(nodes[1].host + '/file/container/test/' + filenameOriginal, {
+        fetch(nodes[0].host + '/file/container/test/' + filenameOriginal, {
           method  : 'PUT',
           body    : formData,
           headers
         }).then(res => {
           should(res.status).eql(200);
 
-          let pathDir  = path.join(__dirname, 'datasets', 'put', 'data_101', '101-200-201');
+          let pathDir  = path.join(__dirname, 'datasets', 'put', 'data_100', '100-101-201');
           let filename = utils.getFileHash(filenameOriginal, config.HASH_SECRET);
           let filePath = path.join(pathDir, 'test', filename + '.enc');
           fs.access(path.join(pathDir, 'test', filename + '.enc'), fs.constants.F_OK, err => {
@@ -401,7 +395,7 @@ describe('API PUT', () => {
 
             utils.deleteFolderRecursive(pathDir);
 
-            pathDir  = path.join(__dirname, 'datasets', 'put', 'data_200', '101-200-201');
+            pathDir  = path.join(__dirname, 'datasets', 'put', 'data_101', '100-101-201');
             filePath = path.join(pathDir, 'test', filename + '.enc');
             fs.access(path.join(pathDir, 'test', filename + '.enc'), fs.constants.F_OK, err => {
               should(err).not.ok();
@@ -434,14 +428,14 @@ describe('API PUT', () => {
         let headers = formData.getHeaders();
         utils.setJWTHeader(headers, 'test', path.join(__dirname, 'datasets', '_keys', 'test.pem'));
 
-        fetch(nodes[1].host + '/file/container/test/' + filenameOriginal, {
+        fetch(nodes[0].host + '/file/container/test/' + filenameOriginal, {
           method  : 'PUT',
           body    : formData,
           headers
         }).then(res => {
           should(res.status).eql(200);
 
-          let pathDir  = path.join(__dirname, 'datasets', 'put', 'data_101', '100-101-200');
+          let pathDir  = path.join(__dirname, 'datasets', 'put', 'data_100', '100-200-201');
           let filename = utils.getFileHash(filenameOriginal, config.HASH_SECRET);
           let filePath = path.join(pathDir, 'test', filename + '.enc');
           fs.access(filePath, fs.constants.F_OK, err => {
@@ -456,7 +450,7 @@ describe('API PUT', () => {
 
               utils.deleteFolderRecursive(pathDir);
 
-              pathDir  = path.join(__dirname, 'datasets', 'put', 'data_100', '100-101-200');
+              pathDir  = path.join(__dirname, 'datasets', 'put', 'data_200', '100-200-201');
               filePath = path.join(pathDir, 'test', filename + '.enc');
               fs.access(filePath, fs.constants.F_OK, err => {
                 should(err).not.ok();

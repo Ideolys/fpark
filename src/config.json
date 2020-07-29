@@ -21,5 +21,7 @@
   "IMAGE_SIZE_DEFAULT_WIDTH"      : 1280,
   "IMAGE_SIZES"                   : {},
 
-  "MAX_FILE_SIZE" : 15000000
+  "MAX_FILE_SIZE" : 15000000,
+
+  "REPLICATION_NB_REPLICAS": 3
 }

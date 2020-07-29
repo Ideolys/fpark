@@ -82,7 +82,7 @@ describe('Repartition', () => {
       should(nodesToPersit).eql([
           { id : 101, host : 'localhost', port : 6001 }
         , { id : 201, host : 'localhost', port : 6003 }
-        , { id : 200, host : 'localhost', port : 6002 }
+        , { id : 100, host : 'localhost', port : 6000 }
       ]);
     });
 
@@ -99,7 +99,7 @@ describe('Repartition', () => {
       should(nodesToPersit).eql([
           { id : 101, host : 'localhost', port : 6001 }
         , { id : 201, host : 'localhost', port : 6003 }
-        , { id : 200, host : 'localhost', port : 6002 }
+        , { id : 100, host : 'localhost', port : 6000 }
       ]);
     });
 
@@ -116,8 +116,123 @@ describe('Repartition', () => {
       should(nodesToPersit).eql([
           { id : 200, host : 'localhost', port : 6002 }
         , { id : 100, host : 'localhost', port : 6000 }
+        , { id : 201, host : 'localhost', port : 6003 }
+      ]);
+    });
+
+    it('should return three nodes among a region if no multi regions', () => {
+      let nodes = [
+          { id : 100, host : 'localhost', port : 6000 }
+        , { id : 101, host : 'localhost', port : 6001 }
+        , { id : 102, host : 'localhost', port : 6002 }
+        , { id : 103, host : 'localhost', port : 6003 }
+      ];
+
+      let nodesToPersit = repartition.getNodesToPersistTo('test-2.png', nodes);
+
+      should(nodesToPersit).eql([
+          { id : 102, host : 'localhost', port : 6002 }
+        , { id : 103, host : 'localhost', port : 6003 }
+        , { id : 100, host : 'localhost', port : 6000 }
+      ]);
+    });
+
+    it('should return three nodes among three regions', () => {
+      let nodes = [
+          { id : 100, host : 'localhost', port : 6000 }
+        , { id : 101, host : 'localhost', port : 6001 }
+        , { id : 200, host : 'localhost', port : 6002 }
+        , { id : 201, host : 'localhost', port : 6003 }
+        , { id : 300, host : 'localhost', port : 6004 }
+        , { id : 201, host : 'localhost', port : 6005 }
+      ];
+
+      let nodesToPersit = repartition.getNodesToPersistTo('test-2.png', nodes);
+
+      should(nodesToPersit).eql([
+          { id : 200, host : 'localhost', port : 6002 }
+        , { id : 300, host : 'localhost', port : 6004 }
+        , { id : 100, host : 'localhost', port : 6000 }
+      ]);
+    });
+
+    it('should return two nodes among a region if no multi regions', () => {
+      let nodes = [
+          { id : 100, host : 'localhost', port : 6000 }
+        , { id : 101, host : 'localhost', port : 6001 }
+        , { id : 102, host : 'localhost', port : 6002 }
+        , { id : 103, host : 'localhost', port : 6003 }
+      ];
+
+      let nodesToPersit = repartition.getNodesToPersistTo('test-2.png', nodes, 2);
+
+      should(nodesToPersit).eql([
+          { id : 100, host : 'localhost', port : 6000 }
         , { id : 101, host : 'localhost', port : 6001 }
       ]);
+    });
+
+    it('should return one node among a region if no multi regions', () => {
+      let nodes = [
+          { id : 100, host : 'localhost', port : 6000 }
+        , { id : 101, host : 'localhost', port : 6001 }
+        , { id : 102, host : 'localhost', port : 6002 }
+        , { id : 103, host : 'localhost', port : 6003 }
+      ];
+
+      let nodesToPersit = repartition.getNodesToPersistTo('test-2.png', nodes, 1);
+
+      should(nodesToPersit).eql([
+          { id : 100, host : 'localhost', port : 6000 }
+      ]);
+    });
+
+    it('should return two nodes among two regions', () => {
+      let nodes = [
+          { id : 100, host : 'localhost', port : 6000 }
+        , { id : 101, host : 'localhost', port : 6001 }
+        , { id : 200, host : 'localhost', port : 6002 }
+        , { id : 201, host : 'localhost', port : 6003 }
+      ];
+
+      let nodesToPersit = repartition.getNodesToPersistTo('test-2.png', nodes, 2);
+
+      should(nodesToPersit).eql([
+          { id : 100, host : 'localhost', port : 6000 }
+        , { id : 200, host : 'localhost', port : 6002 }
+      ]);
+    });
+
+    it('should return four nodes among two regions', () => {
+      let nodes = [
+          { id : 100, host : 'localhost', port : 6000 }
+        , { id : 101, host : 'localhost', port : 6001 }
+        , { id : 200, host : 'localhost', port : 6002 }
+        , { id : 201, host : 'localhost', port : 6003 }
+      ];
+
+      let nodesToPersit = repartition.getNodesToPersistTo('test-2.png', nodes, 4);
+
+      should(nodesToPersit).eql([
+          { id : 200, host : 'localhost', port : 6002 }
+        , { id : 100, host : 'localhost', port : 6000 }
+        , { id : 201, host : 'localhost', port : 6003 }
+        , { id : 101, host : 'localhost', port : 6001 }
+      ]);
+    });
+
+    it('should not return four nodes among one region of two nodes', () => {
+      let nodes = [
+          { id : 100, host : 'localhost', port : 6000 }
+        , { id : 101, host : 'localhost', port : 6001 }
+      ];
+
+      try {
+        repartition.getNodesToPersistTo('test-2.png', nodes, 4);
+      }
+      catch (e) {
+        should(e.message).eql('Number of replica is superior to number of nodes');
+      }
     });
   });
 

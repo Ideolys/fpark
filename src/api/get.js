@@ -73,7 +73,7 @@ function getFile (CONFIG, req, res, params, keyNodes, streams, handler) {
  * @param {Object} store
  */
 exports.getApi = function getApi (req, res, params, store) {
-  let nodes            = repartition.getNodesToPersistTo(params.id, store.CONFIG.NODES);
+  let nodes            = repartition.getNodesToPersistTo(params.id, store.CONFIG.NODES, store.CONFIG.REPLICATION_NB_REPLICAS);
   let isAllowedToWrite = repartition.isCurrentNodeInPersistentNodes(nodes, store.CONFIG.ID);
 
   if (!isAllowedToWrite) {
@@ -87,7 +87,7 @@ exports.getApi = function getApi (req, res, params, store) {
       }
 
       let proxy = proxyFactory(() => {
-        return respond(res, 500);
+        return respond(res, 404);
       });
 
       let headers = {};

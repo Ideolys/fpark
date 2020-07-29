@@ -111,35 +111,48 @@ function getNextRegionByIndex (index) {
  * Get nodes to persist to
  * @param {String} str
  * @param {Array} of nodes { id : Number, host : String, port : Number }
+ * @param {Int} nbReplicas number of replicas for a file
  * @returns {Array} of nodes
  */
-function getNodesToPersistTo (str, nodes) {
-  if (!str) {
+function getNodesToPersistTo (str, nodes, nbReplicas = 3) {
+  if (!str || !nbReplicas || !nodes.length) {
     return null;
   }
 
   setNodesByRegion(nodes);
   let nodesToPersist = [];
-  let hashIndex      = hash(str) % 3; // 3 always persist data on 3 nodes
+  let hashIndex      = hash(str) % nbReplicas;
+
+  if (nbReplicas > nodes.length) {
+    throw new Error('Number of replica is superior to number of nodes');
+  }
 
   _sortNodes(nodes);
 
-  let firstNode = nodes[hashIndex];
-  nodesToPersist.push(firstNode);
+  let lastRegionIndex = {};
 
-  let region     = getRegionForNode(firstNode);
-  let nextRegion = getNextRegionByKey(region);
+  let lastNode = nodes[hashIndex];
+  nodesToPersist.push(lastNode);
 
-  let indexSecondReplica = nodesByRegion[region].indexOf(firstNode);
-  nodesToPersist.push(nodesByRegion[nextRegion][indexSecondReplica]);
+  let region              = getRegionForNode(lastNode);
+  lastRegionIndex[region] = nodesByRegion[region].indexOf(lastNode);
 
-  let regionThirdReplica = getNextRegionByIndex(hashIndex % nbRegions);
-  let indexThirdReplica  = indexSecondReplica + 1;
-  if (indexThirdReplica >= nodesByRegion[regionThirdReplica].length) {
-    indexThirdReplica = 0;
+  for (let i = 0; i < nbReplicas - 1; i++) {
+    let region     = getRegionForNode(lastNode);
+    let nextRegion = getNextRegionByKey(region);
+
+    let index = lastRegionIndex[nextRegion] != null ? lastRegionIndex[nextRegion] + 1 : lastRegionIndex[region];
+
+    if (index >= nodesByRegion[nextRegion].length) {
+      index = 0;
+    }
+
+    lastRegionIndex[nextRegion] = index;
+
+    lastNode = nodesByRegion[nextRegion][index];
+    nodesToPersist.push(lastNode);
   }
 
-  nodesToPersist.push(nodesByRegion[regionThirdReplica][indexThirdReplica]);
   return nodesToPersist;
 }
 
