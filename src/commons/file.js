@@ -1,6 +1,5 @@
 const fs         = require('fs');
 const path       = require('path');
-const zlib       = require('zlib');
 const { padlz }  = require('./utils');
 const encryption = require('../commons/encryption');
 
@@ -41,11 +40,11 @@ module.exports = {
    * @param {Object} CONFIG
    * @param {String} nodes array of authorized nodes to handle request
    * @param {Object} params
-   * @param {Boolean} isGzip
+   * @param {Array} streams array of Stream object to pipe to file read stream
    * @param {Function} handlerError
    * @returns {WritableStream}
    */
-  prepareStreams (CONFIG, nodes, params, isGzip, handlerError) {
+  prepareStreams (CONFIG, nodes, params, streams, handlerError) {
     let paths      = this.getFilePath(CONFIG, nodes, params);
     let fileStream = fs.createReadStream(paths.path);
 
@@ -58,13 +57,15 @@ module.exports = {
     fileStream.on('error', handlerError);
     decryptStream.on('error', handlerError);
 
-    if (isGzip) {
-      let gzipStream = zlib.createGzip();
-      gzipStream.on('error', handlerError);
-      return fileStream.pipe(decryptStream).pipe(gzipStream);
+    let pipedStreams = fileStream.pipe(decryptStream);
+
+    for (let i = 0; i < streams.length; i++) {
+      let stream = streams[i];
+      stream.on('error', handlerError);
+      pipedStreams = pipedStreams.pipe(stream);
     }
 
-    return fileStream.pipe(decryptStream);
+    return pipedStreams;
   }
 
 };
