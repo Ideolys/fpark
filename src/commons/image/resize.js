@@ -1,12 +1,20 @@
 const sharp = require('sharp');
 
 /**
+ * Get size among configured sizes
+ * @returns {Object}
+ */
+exports.getSize = function (CONFIG, size) {
+  return CONFIG.IMAGE_SIZES[size];
+}
+
+/**
  * Resize an image
  * @param {Object} CONFIG
  * @param {String} size @optional
  * @returns {Stream}
  */
-module.exports = function resize (CONFIG, size) {
+exports.resize = function resize (CONFIG, size) {
   let pipeline = sharp();
 
   if (size) {

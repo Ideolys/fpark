@@ -26,7 +26,7 @@ const {
 
 const imageUtils    = require('../commons/image/utils');
 const imageCompress = require('../commons/image/compress');
-const imageResize   = require('../commons/image/resize');
+const imageResize   = require('../commons/image/resize').resize;
 const auth = require('../commons/auth');
 
 /**
