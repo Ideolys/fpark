@@ -1,7 +1,8 @@
-const utils  = require('./utils');
-const fetch  = require('node-fetch');
 const fs     = require('fs');
 const path   = require('path');
+const fetch  = require('node-fetch');
+const sharp  = require('sharp');
+const utils  = require('./utils');
 const config = require('./datasets/configs/100.json');
 const nodes  = config.NODES;
 
@@ -51,6 +52,36 @@ describe('API GET', () => {
         should(res.status).eql(200);
         should(res.headers.get('cache-control')).be.a.String().and.eql('max-age=7776000,immutable');
         done();
+      }).catch(e => {
+        done(e);
+      })
+    });
+
+    it('should get an image & resize on the fly', done => {
+      fetch(nodes[1].host + '/file/container/test/image.jpg?size=S').then(res => {
+        should(res.status).eql(200);
+        res.body.pipe(sharp().metadata((err, metadata) => {
+            should(err).not.ok();
+            should(metadata.width).eql(120);
+            should(metadata.height).eql(80);
+            done();
+          })
+        );
+      }).catch(e => {
+        done(e);
+      })
+    });
+
+    it('should get an image & not resize on the fly if the size is not specified', done => {
+      fetch(nodes[1].host + '/file/container/test/image.jpg?size=M').then(res => {
+        should(res.status).eql(200);
+        res.body.pipe(sharp().metadata((err, metadata) => {
+            should(err).not.ok();
+            should(metadata.width).eql(1100);
+            should(metadata.height).eql(715);
+            done();
+          })
+        );
       }).catch(e => {
         done(e);
       })

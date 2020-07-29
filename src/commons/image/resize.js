@@ -18,11 +18,12 @@ exports.resize = function resize (CONFIG, size) {
   let pipeline = sharp();
 
   if (size) {
-    return pipeline.resize({
-      fit    : 'inside',
+    pipeline.resize({
       width  : CONFIG.IMAGE_SIZES[size].width,
       height : CONFIG.IMAGE_SIZES[size].height
     });
+
+    return pipeline;
   }
 
   pipeline.resize({

@@ -1,4 +1,6 @@
 
+const path         = require('path');
+const url          = require('url');
 const zlib         = require('zlib');
 const fetch        = require('node-fetch');
 const { putFile }  = require('./put');
@@ -19,7 +21,7 @@ const {
   resize,
   getSize
 } = require('../commons/image/resize');
-
+const isImage = require('../commons/image/utils').isImage;
 
 /**
  * Get a file (initialize streams)
@@ -38,6 +40,22 @@ function getFile (CONFIG, req, res, params, keyNodes, streams, handler) {
     }
 
     handler();
+  }
+
+  let extension           = path.extname(params.id);
+  let extensionWithoutDot = extension.replace('.', '');
+
+  if (isImage(extensionWithoutDot) && req.url) {
+    let query  = url.parse(req.url).search;
+
+    if (query) {
+      let sizeId = new URLSearchParams(url.parse(req.url).search).get('size');
+      let size   = getSize(CONFIG, sizeId);
+
+      if (size) {
+        streams.unshift(resize(CONFIG, sizeId));
+      }
+    }
   }
 
   let preparedStreams = file.prepareStreams(CONFIG, keyNodes, params, streams, handlerError);
