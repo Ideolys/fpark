@@ -1,4 +1,5 @@
 
+const zlib         = require('zlib');
 const fetch        = require('node-fetch');
 const { putFile }  = require('./put');
 const repartition  = require('../commons/repartition');
@@ -14,6 +15,10 @@ const {
   respond,
   queue
 } = require('../commons/utils');
+const {
+  resize,
+  getSize
+} = require('../commons/image/resize');
 
 
 /**
@@ -23,10 +28,10 @@ const {
  * @param {Object} res
  * @param {Object} params request's params
  * @param {String} keyNodes path 'node1-node2-node3'
- * @param {Boolean} isGzip
+ * @param {Array} streams
  * @param {Function} handler handler if error
  */
-function getFile (CONFIG, req, res, params, keyNodes, isGzip, handler) {
+function getFile (CONFIG, req, res, params, keyNodes, streams, handler) {
   function handlerError (err) {
     if (getHeaderNthNode(req.headers) === 3 || getHeaderFromNode(req.headers)) {
       return respond(res, 404);
@@ -35,10 +40,10 @@ function getFile (CONFIG, req, res, params, keyNodes, isGzip, handler) {
     handler();
   }
 
-  let streams = file.prepareStreams(CONFIG, keyNodes, params, isGzip, handlerError);
+  let preparedStreams = file.prepareStreams(CONFIG, keyNodes, params, streams, handlerError);
 
   if (res) {
-    streams.pipe(res);
+    preparedStreams.pipe(res);
   }
 }
 
@@ -86,7 +91,7 @@ exports.getApi = function getApi (req, res, params, store) {
   res.setHeader('Cache-Control', 'max-age=' + store.CONFIG.CACHE_CONTROL_MAX_AGE + ',immutable');
   res.setHeader('Content-Encoding', 'gzip');
 
-  getFile(store.CONFIG, req, res, params, keyNodes, true, () => {
+  getFile(store.CONFIG, req, res, params, keyNodes, [zlib.createGzip()], () => {
     let headers =  {
       'accept-encoding' : 'gzip'
     };
@@ -117,7 +122,7 @@ exports.getApi = function getApi (req, res, params, store) {
             return respond(res, 500);
           }
 
-          getFile(store.CONFIG, _req, res, params, keyNodes, false, () => {
+          getFile(store.CONFIG, _req, res, params, keyNodes, [], () => {
             respond(res, 404);
           });
         });

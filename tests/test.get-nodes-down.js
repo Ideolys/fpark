@@ -29,7 +29,7 @@ describe('API GET : nodes down', () => {
       utils.runArchi('get', [
           ['start', '-c', path.join('..', 'configs', '100.json')]
         , ['start', '-c', path.join('..', 'configs', '101.json')]
-        , ['start', '-c', path.join('..', 'configs', '200.json')]
+        , ['start', '-c', path.join('..', 'configs', '201.json')]
       ], () => {
         fetch(nodes[0].host + '/file/container/test/image.jpg').then(res => {
           should(res.status).eql(200);
