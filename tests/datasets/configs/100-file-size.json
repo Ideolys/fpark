@@ -5,7 +5,7 @@
   "NODES"           : [
     { "id" : 100, "host" : "http://localhost:6000" }
   ],
-  "FILE_DIRECTORY": "data_100",
+  "FILES_DIRECTORY": "data_100",
   "KEYS_DIRECTORY" : "keys_100",
   "HASH_SECRET" : "test",
   "ENCRYPTION_IV"        : "srp9zyldyxdzmddx",

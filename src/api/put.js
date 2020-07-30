@@ -39,7 +39,7 @@ const auth = require('../commons/auth');
  * @param {Function} callback
  */
 function putFile (fileStream, params, store, keyNodes, isFromAnotherNode, callback) {
-  let pathDisk = path.join(store.CONFIG.FILE_DIRECTORY, keyNodes);
+  let pathDisk = path.join(store.CONFIG.FILES_DIRECTORY, keyNodes);
   createDirIfNotExists(pathDisk, err => {
     if (err) {
       console.log('Cannot create container', err);

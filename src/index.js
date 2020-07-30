@@ -66,7 +66,7 @@ function runServer (config, callback) {
     return;
   }
 
-  utils.createDirIfNotExistsSync(CONFIG.FILE_DIRECTORY);
+  utils.createDirIfNotExistsSync(CONFIG.FILES_DIRECTORY);
   utils.createDirIfNotExistsSync(CONFIG.KEYS_DIRECTORY);
 
   api(router, { CONFIG });

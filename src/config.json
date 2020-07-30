@@ -3,7 +3,7 @@
   "SERVER_CLUSTERS"         : 4,
   "NODES"                   : [],
   "LOGS_DIRECTORY"          : "logs",
-  "FILE_DIRECTORY"          : "data",
+  "FILES_DIRECTORY"         : "data",
   "KEYS_DIRECTORY"          : "keys",
   "IS_REGISTRATION_ENABLED" : true,
 
