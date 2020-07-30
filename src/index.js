@@ -50,7 +50,7 @@ function runServer (config, callback) {
 
   if (cluster.isMaster || CONFIG.SERVER_CLUSTERS <= 1) {
     process.env.KITTEN_LOGGER_RETENTION_DIRECTORY = CONFIG.LOGS_DIRECTORY;
-    process.env.KITTEN_LOGGER_RETENTION_FILENAME  = 'salt.' + CONFIG.SERVER_PORT;
+    process.env.KITTEN_LOGGER_RETENTION_FILENAME  = 'fpark.' + CONFIG.SERVER_PORT;
     kittenLogger.init();
   }
 
