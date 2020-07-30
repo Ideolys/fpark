@@ -9,7 +9,6 @@ let _path = process.cwd();
 
 function loadConfig (pathConfig) {
   let _configPath = pathConfig ? path.join(process.cwd(), pathConfig) : path.join(_path, 'fpark.json');
-  console.log(_configPath);
   if (fs.existsSync(_configPath)) {
     _config = fs.readFileSync(_configPath, 'utf8');
 
