@@ -44,6 +44,10 @@ function initCluster (nbWorkers = numCPUs) {
 function runServer (config, callback) {
   Object.assign(CONFIG, config);
 
+  if (!CONFIG.ID && CONFIG.NODES.length) {
+    throw new Error('The given configuration must defined the key "ID"');
+  }
+
   if (cluster.isMaster || CONFIG.SERVER_CLUSTERS <= 1) {
     process.env.KITTEN_LOGGER_RETENTION_DIRECTORY = CONFIG.LOGS_DIRECTORY;
     process.env.KITTEN_LOGGER_RETENTION_FILENAME  = 'salt.' + CONFIG.SERVER_PORT;
