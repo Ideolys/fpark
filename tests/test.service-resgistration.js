@@ -10,6 +10,28 @@ let filePath = path.join(__dirname, 'datasets', 'service-registration', 'keys_10
 
 describe('Service registration', () => {
 
+  it('should not register a node if registration si disabled', done => {
+    runArchi('service-registration', [
+      ['start', '-c', path.join('..', 'configs', '100-no-service-registration.json')]
+    ], () => {
+      fetch(url, {
+        method  : 'POST',
+        headers : {
+          'Content-Type' : 'application/json'
+        },
+        body : JSON.stringify({
+          container : 123456789,
+          key       : '/* MY PUBLIC KEY */'
+        })
+      }).then(res => {
+        should(res.status).eql(404);
+        done();
+      }).catch(e => {
+        done(e);
+      });
+    });
+  });
+
   describe('one node', () => {
 
     beforeEach(() => {

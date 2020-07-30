@@ -13,7 +13,9 @@ function load (router, store) {
   router.on('PUT'   , '/file/container/:containerId/:id', putApi, store);
   router.on('DELETE', '/file/container/:containerId/:id', delApi, store);
 
-  router.on('POST', '/node/register', nodeApi, store);
+  if (store.CONFIG.IS_REGISTRATION_ENABLED) {
+    router.on('POST', '/node/register', nodeApi, store);
+  }
 }
 
 module.exports = load;

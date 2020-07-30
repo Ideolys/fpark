@@ -1,10 +1,11 @@
 {
-  "SERVER_PORT"     : 6000,
-  "SERVER_CLUSTERS" : 4,
-  "NODES"           : [],
-  "LOGS_DIRECTORY"  : "logs",
-  "FILE_DIRECTORY"  : "data",
-  "KEYS_DIRECTORY"  : "keys",
+  "SERVER_PORT"             : 6000,
+  "SERVER_CLUSTERS"         : 4,
+  "NODES"                   : [],
+  "LOGS_DIRECTORY"          : "logs",
+  "FILE_DIRECTORY"          : "data",
+  "KEYS_DIRECTORY"          : "keys",
+  "IS_REGISTRATION_ENABLED" : true,
 
   "ENCRYPTION_IV"        : "srp9zyldyxdzmddx",
   "ENCRYPTION_IV_LENGTH" : 16,
