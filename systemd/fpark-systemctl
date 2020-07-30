@@ -15,4 +15,3 @@ sudo chown -R fpark:fpark /var/www/fpark
 
 sudo systemctl daemon-reload
 sudo systemctl enable fpark
-sudo systemctl start fpark
