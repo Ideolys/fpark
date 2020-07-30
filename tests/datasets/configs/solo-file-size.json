@@ -1,13 +1,14 @@
 {
-  "ID"              : 100,
+  "ID"              : 1,
   "SERVER_PORT"     : 6000,
   "SERVER_CLUSTERS" : 1,
   "NODES"           : [],
-  "FILE_DIRECTORY": "data_100",
-  "KEYS_DIRECTORY" : "keys_100",
+  "FILE_DIRECTORY" : "data_1",
+  "KEYS_DIRECTORY" : "keys_1",
   "HASH_SECRET" : "test",
   "ENCRYPTION_IV"        : "srp9zyldyxdzmddx",
   "ENCRYPTION_IV_LENGTH" : 16,
   "ENCRYPTION_ALGORITHM" : "aes-128-ctr",
-  "IMAGE_SIZE_DEFAULT_WIDTH"      : 1280
+
+  "MAX_FILE_SIZE" : 1000
 }

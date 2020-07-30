@@ -106,7 +106,7 @@ exports.putApi = function put (req, res, params, store) {
     let nodes            = repartition.getNodesToPersistTo(params.id, store.CONFIG.NODES, store.CONFIG.REPLICATION_NB_REPLICAS);
     let isAllowedToWrite = repartition.isCurrentNodeInPersistentNodes(nodes, store.CONFIG.ID);
 
-    if (!isAllowedToWrite) {
+    if (!isAllowedToWrite && nodes.length) {
       if (getHeaderNthNode(req.headers) === 3) {
         return respond(res, 500);
       }
@@ -203,7 +203,7 @@ exports.putApi = function put (req, res, params, store) {
             next();
           })
         }, () => {
-          respond(res, 500);
+          respond(res, nodes.length ? 500 : 200);
         });
       });
     });

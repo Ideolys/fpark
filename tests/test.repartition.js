@@ -39,16 +39,29 @@ describe('Repartition', () => {
       should(repartition.getNodesToPersistTo).be.a.Function();
     });
 
-    it('should return null if no string is given', () => {
-      should(repartition.getNodesToPersistTo()).eql(null);
+    it('should return [] if no string is given', () => {
+      should(repartition.getNodesToPersistTo()).eql([]);
     });
 
-    it('should return null if null is given', () => {
-      should(repartition.getNodesToPersistTo(null)).eql(null);
+    it('should return [] if null is given', () => {
+      should(repartition.getNodesToPersistTo(null)).eql([]);
     });
 
-    it('should return null if an empty is given', () => {
-      should(repartition.getNodesToPersistTo('')).eql(null);
+    it('should return [] if an empty is given', () => {
+      should(repartition.getNodesToPersistTo('')).eql([]);
+    });
+
+    it('should return [] if an empty nodes array is given', () => {
+      should(repartition.getNodesToPersistTo('a', [], 3)).eql([]);
+    });
+
+    it('should return [] is nbReplicas = 0', () => {
+      should(repartition.getNodesToPersistTo('a', [
+          { id : 100, host : 'localhost', port : 6000 }
+        , { id : 101, host : 'localhost', port : 6001 }
+        , { id : 200, host : 'localhost', port : 6002 }
+        , { id : 201, host : 'localhost', port : 6003 }
+      ], 0)).eql([]);
     });
 
     it('should return an array if value is given', () => {

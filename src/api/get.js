@@ -76,7 +76,7 @@ exports.getApi = function getApi (req, res, params, store) {
   let nodes            = repartition.getNodesToPersistTo(params.id, store.CONFIG.NODES, store.CONFIG.REPLICATION_NB_REPLICAS);
   let isAllowedToWrite = repartition.isCurrentNodeInPersistentNodes(nodes, store.CONFIG.ID);
 
-  if (!isAllowedToWrite) {
+  if (!isAllowedToWrite && nodes.length) {
     if (getHeaderNthNode(req.headers) === 3) {
       return respond(res, 404);
     }
@@ -110,6 +110,10 @@ exports.getApi = function getApi (req, res, params, store) {
   res.setHeader('Content-Encoding', 'gzip');
 
   getFile(store.CONFIG, req, res, params, keyNodes, [zlib.createGzip()], () => {
+    if (!nodes.length) {
+      return respond(res, 404);
+    }
+
     let headers =  {
       'accept-encoding' : 'gzip'
     };

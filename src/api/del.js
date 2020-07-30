@@ -28,7 +28,7 @@ exports.delApi = function delApi (req, res, params, store) {
     let nodes            = getNodesToPersistTo(params.id, store.CONFIG.NODES, store.CONFIG.REPLICATION_NB_REPLICAS);
     let isAllowedToWrite = isCurrentNodeInPersistentNodes(nodes, store.CONFIG.ID);
 
-    if (!isAllowedToWrite) {
+    if (!isAllowedToWrite && nodes.length) {
       if (getHeaderNthNode(req.headers) === 3) {
         return respond(res, 500);
       }
@@ -63,7 +63,7 @@ exports.delApi = function delApi (req, res, params, store) {
         return respond(res, 404);
       }
 
-      if (getHeaderFromNode(req.headers) && !req.headers['x-forwarded-for']) {
+      if ((getHeaderFromNode(req.headers) && !req.headers['x-forwarded-for']) || !nodes.length) {
         return respond(res, 200);
       }
 

@@ -116,7 +116,7 @@ function getNextRegionByIndex (index) {
  */
 function getNodesToPersistTo (str, nodes, nbReplicas = 3) {
   if (!str || !nbReplicas || !nodes.length) {
-    return null;
+    return [];
   }
 
   setNodesByRegion(nodes);
