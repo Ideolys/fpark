@@ -5,6 +5,9 @@
   "scripts": {
     "test": "mocha tests/test.*.js -w"
   },
+  "bin": {
+    "fpark": "./fpark"
+  },
   "author": "",
   "license": "ISC",
   "dependencies": {
