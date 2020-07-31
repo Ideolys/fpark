@@ -1,6 +1,6 @@
 {
   "name": "fpark",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "main": "index.js",
   "scripts": {
     "test": "mocha tests/test.*.js -w"
@@ -8,8 +8,8 @@
   "bin": {
     "fpark": "./fpark"
   },
-  "author": "",
-  "license": "ISC",
+  "author": "Ideolys",
+  "license": "Apache 2",
   "dependencies": {
     "busboy": "^0.3.1",
     "find-my-way": "^2.0.1",
