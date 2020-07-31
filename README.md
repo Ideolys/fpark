@@ -200,4 +200,4 @@ The only way to decrypt a file is to know the filename **and** the `ENCRYPTION_I
 
 ## License
 
-Appache 2.
+Apache 2.0

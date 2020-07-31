@@ -1,0 +1,13 @@
+[Unit]
+Description=fpark
+After=network.target
+
+[Service]
+Type=forking
+WorkingDirectory=/var/www/fpark
+User=fpark
+ExecStart=/var/www/fpark/sharp/build/Release/fpark start -c fpark.config.json
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

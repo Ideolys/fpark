@@ -9,7 +9,7 @@
     "fpark": "./fpark"
   },
   "author": "Ideolys",
-  "license": "Apache 2",
+  "license": "Apache-2.0",
   "dependencies": {
     "busboy": "^0.3.1",
     "find-my-way": "^2.0.1",
