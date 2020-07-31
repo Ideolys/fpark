@@ -32,7 +32,7 @@ jobs:
           cp -r node_modules/sharp build/sharp
           mv build/fpark build/sharp/build/Release
       - name: Compress build
-        run: tar -czvf build.tar.gz build/*
+        run: tar -czvf build.tar.gz -C build .
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1

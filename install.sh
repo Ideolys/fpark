@@ -16,7 +16,6 @@ echo "Get binary...OK"
 
 echo "Set Fpark directory..."
 mkdir /var/www/fpark
-mkdir /var/www/fpark/bin
 sudo adduser fpark --no-create-home --disabled-password --system --group
 tar -xzf build.tar.gz -C /var/www/fpark
 curl -s https://raw.githubusercontent.com/Ideolys/fpark/v${PACKAGE_VERSION}/src/config.json > /var/www/fpark/fpark.config.json
