@@ -24,7 +24,7 @@ jobs:
       - name: Install Dependencies
         run: npm install
       - name: Install pkg
-        run: npm i -g pkg
+        run: sudo npm i -g pkg
       - name: Build
         run: pkg -t node12-linux --out-path ./build .
       - name: Copy dependencies in build dir
