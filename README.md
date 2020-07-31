@@ -59,6 +59,15 @@ vi config.json
 ./fpark start -c config.json
 ```
 
+### Systemd
+
+- Install
+
+```
+ cd /tmp
+ curl https://raw.githubusercontent.com/Ideolys/fpark/master/install.sh | sudo bash
+```
+
 ## Usage
 
 ### Configuration
