@@ -14,13 +14,17 @@ echo "... found version ${PACKAGE_VERSION}"
 curl -LJOs https://github.com/Ideolys/fpark/releases/download/v${PACKAGE_VERSION}/build.tar.gz
 echo "Get binary...OK"
 
-echo "Set Fpark directory..."
-mkdir /var/www/fpark
-sudo adduser fpark --no-create-home --disabled-password --system --group
-tar -xzf build.tar.gz -C /var/www/fpark
-curl -s https://raw.githubusercontent.com/Ideolys/fpark/v${PACKAGE_VERSION}/src/config.json > /var/www/fpark/fpark.config.json
-sudo chown -R fpark:fpark /var/www/fpark
-echo "Set Fpark directory...OK"
+if [ ! -d '/var/www/fpark' ]
+then
+  echo "Set Fpark directory..."
+  mkdir /var/www/fpark
+  sudo adduser fpark --no-create-home --disabled-password --system --group
+  curl -s https://raw.githubusercontent.com/Ideolys/fpark/v${PACKAGE_VERSION}/src/config.json > /var/www/fpark/fpark.config.json
+  sudo chown -R fpark:fpark /var/www/fpark
+  echo "Set Fpark directory...OK"
+fi
+
+sudo -u fpark tar -xzf build.tar.gz -C /var/www/fpark
 
 echo "Register service..."
 curl -s https://raw.githubusercontent.com/Ideolys/fpark/v${PACKAGE_VERSION}/systemd > /etc/systemd/system/fpark.service
