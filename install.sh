@@ -18,13 +18,13 @@ echo "Set Fpark directory..."
 mkdir /var/www/fpark
 mkdir /var/www/fpark/bin
 sudo adduser fpark --no-create-home --disabled-password --system --group
+tar -xzf build.tar.gz -C /var/www/fpark
+curl -s https://raw.githubusercontent.com/Ideolys/fpark/v${PACKAGE_VERSION}/src/config.json > /var/www/fpark/fpark.config.json
 sudo chown -R fpark:fpark /var/www/fpark
-fpark tar -xzf build.tar.gz -C /var/www/fpark
-curl -s https://raw.githubusercontent.com/Ideolys/fpark/v{PACKAGE_VERSION}/src/config.json > /var/www/fpark/fpark.config.json
 echo "Set Fpark directory...OK"
 
 echo "Register service..."
-curl -s https://raw.githubusercontent.com/Ideolys/fpark/v{PACKAGE_VERSION}/systemd > /etc/systemd/system/fpark.service
+curl -s https://raw.githubusercontent.com/Ideolys/fpark/v${PACKAGE_VERSION}/systemd > /etc/systemd/system/fpark.service
 sudo systemctl daemon-reload > /dev/null 2>&1
 sudo systemctl enable fpark
 echo "Register service...OK"
