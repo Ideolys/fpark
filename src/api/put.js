@@ -29,6 +29,9 @@ const imageCompress = require('../commons/image/compress');
 const imageResize   = require('../commons/image/resize').resize;
 const auth = require('../commons/auth');
 
+const kittenLogger = require('kitten-logger');
+const logger       = kittenLogger.createPersistentLogger('put_file');
+
 /**
  * PUT a file
  * @param {Stream} fileStream
@@ -108,6 +111,7 @@ exports.putApi = function put (req, res, params, store) {
 
     if (!isAllowedToWrite && nodes.length) {
       if (getHeaderNthNode(req.headers) === 3) {
+        logger.warn({ msg : 'Depth reached', from : getHeaderFromNode(req.headers) }, { idKittenLogger : req.log_id });
         return respond(res, 500);
       }
 
@@ -117,6 +121,7 @@ exports.putApi = function put (req, res, params, store) {
         }
 
         let proxy = proxyFactory(() => {
+          logger.warn({ msg : 'Cannot proxy', from : getHeaderFromNode(req.headers) }, { idKittenLogger : req.log_id });
           return respond(res, 500);
         });
 
@@ -130,6 +135,7 @@ exports.putApi = function put (req, res, params, store) {
           headers
         });
       }, () => {
+        logger.warn({ msg : 'Cannot proxy', from : getHeaderFromNode(req.headers) }, { idKittenLogger : req.log_id });
         respond(res, 500);
       });
     }
@@ -164,6 +170,7 @@ exports.putApi = function put (req, res, params, store) {
 
       putFile(fileStream, params, store, keyNodes, getHeaderReplication(req.headers), (err) => {
         if (err) {
+          logger.warn({ msg : 'Cannot put file', err }, { idKittenLogger : req.log_id });
           return respond(res, 500);
         }
 
@@ -209,6 +216,7 @@ exports.putApi = function put (req, res, params, store) {
     });
 
     busboy.on('error' , err => {
+      logger.warn({ msg : 'Cannot put file', err }, { idKittenLogger : req.log_id });
       respond(res, 500);
     });
 

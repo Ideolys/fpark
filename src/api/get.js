@@ -23,6 +23,9 @@ const {
 } = require('../commons/image/resize');
 const isImage = require('../commons/image/utils').isImage;
 
+const kittenLogger = require('kitten-logger');
+const logger       = kittenLogger.createPersistentLogger('get_file');
+
 /**
  * Get a file (initialize streams)
  * @param {Object} CONFIG
@@ -36,6 +39,7 @@ const isImage = require('../commons/image/utils').isImage;
 function getFile (CONFIG, req, res, params, keyNodes, streams, handler) {
   function handlerError (err) {
     if (getHeaderNthNode(req.headers) === 3 || getHeaderFromNode(req.headers)) {
+      logger.warn({ msg : 'Depth reached', from : getHeaderFromNode(req.headers) }, { idKittenLogger : req.log_id });
       return respond(res, 404);
     }
 
@@ -78,6 +82,7 @@ exports.getApi = function getApi (req, res, params, store) {
 
   if (!isAllowedToWrite && nodes.length) {
     if (getHeaderNthNode(req.headers) === 3) {
+      logger.warn({ msg : 'Depth reached', from : getHeaderFromNode(req.headers) }, { idKittenLogger : req.log_id });
       return respond(res, 404);
     }
 
@@ -100,6 +105,7 @@ exports.getApi = function getApi (req, res, params, store) {
         headers
       });
     }, () => {
+      logger.warn({ msg : 'Cannot proxy',  }, { idKittenLogger : req.log_id });
       respond(res, 500);
     });
   }
@@ -141,6 +147,7 @@ exports.getApi = function getApi (req, res, params, store) {
 
         putFile(resRequest.body, params, store, keyNodes, null, err => {
           if (err) {
+            logger.warn({ msg : 'Cannot get file', err }, { idKittenLogger : req.log_id });
             return respond(res, 500);
           }
 

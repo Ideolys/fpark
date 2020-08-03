@@ -16,6 +16,9 @@ const proxyFactory       = require('../commons/proxy');
 const file               = require('../commons/file');
 const { verify }         = require('../commons/auth');
 
+const kittenLogger = require('kitten-logger');
+const logger       = kittenLogger.createPersistentLogger('del_file');
+
 /**
  * DEL API
  * @param {Object} req
@@ -30,6 +33,7 @@ exports.delApi = function delApi (req, res, params, store) {
 
     if (!isAllowedToWrite && nodes.length) {
       if (getHeaderNthNode(req.headers) === 3) {
+        logger.warn({ msg : 'Depth reached', from : getHeaderFromNode(req.headers) }, { idKittenLogger : req.log_id });
         return respond(res, 500);
       }
 
@@ -39,6 +43,7 @@ exports.delApi = function delApi (req, res, params, store) {
         }
 
         let proxy = proxyFactory(() => {
+          logger.warn({ msg : 'cannot proxy' }, { idKittenLogger : req.log_id });
           return respond(res, 500);
         });
 
@@ -52,6 +57,7 @@ exports.delApi = function delApi (req, res, params, store) {
           headers
         });
       }, () => {
+        logger.warn({ msg : 'Cannot proxy' }, { idKittenLogger : req.log_id });
         respond(res, 500);
       });
     }
@@ -60,6 +66,7 @@ exports.delApi = function delApi (req, res, params, store) {
     let filePath = file.getFilePath(store.CONFIG, keyNodes, params);
     fs.unlink(filePath.path, err => {
       if (err) {
+        logger.warn({ msg : 'cannot delete', err }, { idKittenLogger : req.log_id });
         return respond(res, 404);
       }
 
