@@ -22,7 +22,7 @@ module.exports = function nodRegister (req, res, params, store) {
         return  respond(res, 400);
       }
 
-      if (!_body.container || !_body.key) {
+      if (!_body.container || !_body.key || !_body.accessKey) {
         return respond(res, 400);
       }
 
@@ -35,40 +35,46 @@ module.exports = function nodRegister (req, res, params, store) {
           return respond(res, 500);
         }
 
-        setKey(_body.container, _body.key);
-
-        if (getHeaderFromNode(req.headers)) {
-          return respond(res, 200);
-        }
-
-        queue(store.CONFIG.NODES, (node, next) => {
-          if (node.id === store.CONFIG.ID) {
-            return next();
+        fs.writeFile(path.join(store.CONFIG.KEYS_DIRECTORY, _body.container + '.access_key'), _body.accessKey, { flag : 'wx' }, (err) => {
+          if (err) {
+            return respond(res, 500);
           }
 
-          let headers = {
-            'Content-Type' : 'application/json'
-          };
-          setHeaderCurrentNode(headers);
+          setKey(_body.container, _body.key);
 
-          let _req =  {
-            method : 'POST',
-            headers,
-            body
-          };
+          if (getHeaderFromNode(req.headers)) {
+            return respond(res, 200);
+          }
 
-          fetch(node.host + req.url, _req).then((resRequest) => {
-            if (resRequest.status !== 200) {
-              return respond(res, 500);
+          queue(store.CONFIG.NODES, (node, next) => {
+            if (node.id === store.CONFIG.ID) {
+              return next();
             }
 
-            next();
-          }).catch(() => {
-            return respond(res, 500);
+            let headers = {
+              'Content-Type' : 'application/json'
+            };
+            setHeaderCurrentNode(headers);
+
+            let _req =  {
+              method : 'POST',
+              headers,
+              body
+            };
+
+            fetch(node.host + req.url, _req).then((resRequest) => {
+              if (resRequest.status !== 200) {
+                return respond(res, 500);
+              }
+
+              next();
+            }).catch(() => {
+              return respond(res, 500);
+            });
+          }, () => {
+            // No file has been found
+            respond(res, 200);
           });
-        }, () => {
-          // No file has been found
-          respond(res, 200);
         });
       });
     }

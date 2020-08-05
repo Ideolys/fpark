@@ -5,8 +5,9 @@ const should = require('should');
 const config = require('./datasets/configs/100.json');
 const { runArchi, stopArchi, deleteFolderRecursive } = require('./utils');
 
-let url      = config.NODES[0].host + '/node/register';
-let filePath = path.join(__dirname, 'datasets', 'service-registration', 'keys_100', '123456789.pub');
+let url               = config.NODES[0].host + '/node/register';
+let filePath          = path.join(__dirname, 'datasets', 'service-registration', 'keys_100', '123456789.pub');
+let filePathAccessKey = path.join(__dirname, 'datasets', 'service-registration', 'keys_100', '123456789.access_key');
 
 describe('Service registration', () => {
 
@@ -55,15 +56,21 @@ describe('Service registration', () => {
         },
         body : JSON.stringify({
           container : 123456789,
-          key       : '/* MY PUBLIC KEY */'
+          key       : '/* MY PUBLIC KEY */',
+          accessKey : 'secret'
         })
       }).then(res => {
         should(res.status).eql(200);
         fs.readFile(filePath, (err, file) => {
           should(err).not.ok();
           should(file.toString()).eql('/* MY PUBLIC KEY */');
-          done();
-        })
+
+          fs.readFile(filePathAccessKey, (err, file) => {
+            should(err).not.ok();
+            should(file.toString()).eql('secret');
+            done();
+          });
+        });
       }).catch(e => {
         done(e);
       });
@@ -77,7 +84,8 @@ describe('Service registration', () => {
         },
         body : JSON.stringify({
           container : 123456789,
-          key       : '/* MY PUBLIC KEY */'
+          key       : '/* MY PUBLIC KEY */',
+          accessKey : 'secret'
         })
       }).then(res => {
         should(res.status).eql(200);
@@ -85,22 +93,36 @@ describe('Service registration', () => {
           should(err).not.ok();
           should(file.toString()).eql('/* MY PUBLIC KEY */');
 
-          fetch(url, {
-            method  : 'POST',
-            headers : {
-              'Content-Type' : 'application/json'
-            },
-            body : JSON.stringify({
-              container : 123456789,
-              key       : '/* MY PUBLIC KEY */'
-            })
-          }).then(res => {
-            should(res.status).eql(200);
-            done();
-          }).catch(e => {
-            done(e);
-          });
+          fs.readFile(filePathAccessKey, (err, file) => {
+            should(err).not.ok();
+            should(file.toString()).eql('secret');
 
+            fetch(url, {
+              method  : 'POST',
+              headers : {
+                'Content-Type' : 'application/json'
+              },
+              body : JSON.stringify({
+                container : 123456789,
+                key       : '/* MY PUBLIC KEY 2 */',
+                accessKey : 'secret2'
+              })
+            }).then(res => {
+              should(res.status).eql(200);
+              fs.readFile(filePath, (err, file) => {
+                should(err).not.ok();
+                should(file.toString()).eql('/* MY PUBLIC KEY */');
+                fs.readFile(filePathAccessKey, (err, file) => {
+                  should(err).not.ok();
+                  should(file.toString()).eql('secret');
+                  done();
+                });
+              });
+            }).catch(e => {
+              done(e);
+            });
+
+          });
         })
       }).catch(e => {
         done(e);
@@ -112,13 +134,17 @@ describe('Service registration', () => {
         method  : 'POST',
         body : JSON.stringify({
           container : 123456789,
-          key       : '/* MY PUBLIC KEY */'
+          key       : '/* MY PUBLIC KEY */',
+          accessKey : 'secret'
         })
       }).then(res => {
         should(res.status).eql(400);
         fs.access(filePath, (err) => {
           should(err).ok();
-          done();
+          fs.readFile(filePathAccessKey, (err) => {
+            should(err).ok();
+            done();
+          });
         });
       }).catch(e => {
         done(e);
@@ -136,7 +162,10 @@ describe('Service registration', () => {
           should(res.status).eql(500);
           fs.access(filePath, (err) => {
             should(err).ok();
-            done();
+            fs.readFile(filePathAccessKey, (err) => {
+              should(err).ok();
+              done();
+            });
           });
       }).catch(e => {
         done(e);
@@ -153,7 +182,10 @@ describe('Service registration', () => {
         should(res.status).eql(500);
         fs.access(filePath, (err) => {
           should(err).ok();
-          done();
+          fs.readFile(filePathAccessKey, (err) => {
+            should(err).ok();
+            done();
+          });
         });
       }).catch(e => {
         done(e);
@@ -173,7 +205,10 @@ describe('Service registration', () => {
         should(res.status).eql(400);
         fs.access(filePath, (err) => {
           should(err).ok();
-          done();
+          fs.readFile(filePathAccessKey, (err) => {
+            should(err).ok();
+            done();
+          });
         });
       }).catch(e => {
         done(e);
@@ -193,7 +228,34 @@ describe('Service registration', () => {
           should(res.status).eql(400);
           fs.access(filePath, (err) => {
             should(err).ok();
-            done();
+            fs.readFile(filePathAccessKey, (err) => {
+              should(err).ok();
+              done();
+            });
+          });
+      }).catch(e => {
+        done(e);
+      })
+    });
+
+    it('should not register the service if the body has no accessKey', done => {
+      fetch(url, {
+        method  : 'POST',
+        headers : {
+          'Content-Type' : 'application/json'
+        },
+          body : JSON.stringify({
+            container : 123456789,
+            key       : '/* MY PUBLIC KEY */'
+          })
+        }).then(res => {
+          should(res.status).eql(400);
+          fs.access(filePath, (err) => {
+            should(err).ok();
+            fs.readFile(filePathAccessKey, (err) => {
+              should(err).ok();
+              done();
+            });
           });
       }).catch(e => {
         done(e);
@@ -219,26 +281,39 @@ describe('Service registration', () => {
           },
           body : JSON.stringify({
             container : 123456789,
-            key       : '/* MY PUBLIC KEY */'
+            key       : '/* MY PUBLIC KEY */',
+            accessKey : 'secret'
           })
         }).then(res => {
           should(res.status).eql(200);
 
-          let filePath100 = path.join(__dirname, 'datasets', 'service-registration', 'keys_100', '123456789.pub');
-          let filePath101 = path.join(__dirname, 'datasets', 'service-registration', 'keys_101', '123456789.pub');
+          let filePath100          = path.join(__dirname, 'datasets', 'service-registration', 'keys_100', '123456789.pub');
+          let filePath100AccessKey = path.join(__dirname, 'datasets', 'service-registration', 'keys_100', '123456789.access_key');
+          let filePath101          = path.join(__dirname, 'datasets', 'service-registration', 'keys_101', '123456789.pub');
+          let filePath101AccessKey = path.join(__dirname, 'datasets', 'service-registration', 'keys_101', '123456789.access_key');
 
           fs.readFile(filePath100, (err, file) => {
             should(err).not.ok();
             should(file.toString()).eql('/* MY PUBLIC KEY */');
 
-            deleteFolderRecursive(path.join(__dirname, 'datasets', 'service-registration', 'keys_100'));
-
-            fs.readFile(filePath101, (err, file) => {
+            fs.readFile(filePath100AccessKey, (err, file) => {
               should(err).not.ok();
-              should(file.toString()).eql('/* MY PUBLIC KEY */');
+              should(file.toString()).eql('secret');
 
-              deleteFolderRecursive(path.join(__dirname, 'datasets', 'service-registration', 'keys_101'));
-              stopArchi(done);
+              deleteFolderRecursive(path.join(__dirname, 'datasets', 'service-registration', 'keys_100'));
+
+              fs.readFile(filePath101, (err, file) => {
+                should(err).not.ok();
+                should(file.toString()).eql('/* MY PUBLIC KEY */');
+
+                fs.readFile(filePath101AccessKey, (err, file) => {
+                  should(err).not.ok();
+                  should(file.toString()).eql('secret');
+
+                  deleteFolderRecursive(path.join(__dirname, 'datasets', 'service-registration', 'keys_101'));
+                  stopArchi(done);
+                });
+              });
             });
           });
         }).catch(e => {
@@ -260,23 +335,35 @@ describe('Service registration', () => {
           },
           body : JSON.stringify({
             container : 123456789,
-            key       : '/* MY PUBLIC KEY */'
+            key       : '/* MY PUBLIC KEY */',
+            accessKey : 'secret'
           })
         }).then(res => {
           should(res.status).eql(500);
 
-          let filePath100 = path.join(__dirname, 'datasets', 'service-registration', 'keys_100', '123456789.pub');
-          let filePath101 = path.join(__dirname, 'datasets', 'service-registration', 'keys_101', '123456789.pub');
+          let filePath100          = path.join(__dirname, 'datasets', 'service-registration', 'keys_100', '123456789.pub');
+          let filePath100AccessKey = path.join(__dirname, 'datasets', 'service-registration', 'keys_100', '123456789.access_key');
+          let filePath101          = path.join(__dirname, 'datasets', 'service-registration', 'keys_101', '123456789.pub');
+          let filePath101AccessKey = path.join(__dirname, 'datasets', 'service-registration', 'keys_101', '123456789.access_key');
 
           fs.readFile(filePath100, (err, file) => {
             should(err).not.ok();
             should(file.toString()).eql('/* MY PUBLIC KEY */');
 
-            deleteFolderRecursive(path.join(__dirname, 'datasets', 'service-registration', 'keys_100'));
+            fs.readFile(filePath100AccessKey, (err, file) => {
+              should(err).not.ok();
+              should(file.toString()).eql('secret');
 
-            fs.access(filePath101, fs.constants.F_OK, err => {
-              should(err).ok();
-              stopArchi(done);
+              deleteFolderRecursive(path.join(__dirname, 'datasets', 'service-registration', 'keys_100'));
+
+              fs.access(filePath101, fs.constants.F_OK, err => {
+                should(err).ok();
+
+                fs.access(filePath101AccessKey, fs.constants.F_OK, err => {
+                  should(err).ok();
+                  stopArchi(done);
+                });
+              });
             });
           });
         }).catch(e => {

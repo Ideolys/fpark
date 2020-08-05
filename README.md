@@ -137,7 +137,8 @@ The body must be a valid JSON object with :
 ```json
 {
   "container" : "a unique key",
-  "key"       : "public key"
+  "key"       : "public key",
+  "accessKey" : "a key to access GET /file/:filename"
 }
 ```
 
