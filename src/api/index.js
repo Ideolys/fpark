@@ -9,9 +9,9 @@ const nodeApi     = require('./node');
  * @param {Object} store { CONFIG }
  */
 function load (router, store) {
-  router.on('GET'   , '/file/container/:containerId/:id', getApi, store);
-  router.on('PUT'   , '/file/container/:containerId/:id', putApi, store);
-  router.on('DELETE', '/file/container/:containerId/:id', delApi, store);
+  router.on('GET'   , '/file/:id/container/:containerId', getApi, store);
+  router.on('PUT'   , '/file/:id/container/:containerId', putApi, store);
+  router.on('DELETE', '/file/:id/container/:containerId', delApi, store);
 
   if (store.CONFIG.IS_REGISTRATION_ENABLED) {
     router.on('POST', '/node/register', nodeApi, store);

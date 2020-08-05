@@ -18,10 +18,37 @@ describe('API GET', () => {
       utils.stopArchi(done);
     });
 
-    describe('GET /file/container/:containerId/:id', () => {
+    describe('GET /file/:id/container/:containerId', () => {
+
+      it('should return a 401 if no access_key', done => {
+        fetch(nodes[1].host + '/file/1.jpg/container/test').then(res => {
+          should(res.status).eql(401);
+          done();
+        }).catch(e => {
+          done(e);
+        });
+      });
+
+      it('should return a 401 if containerId does not exist', done => {
+        fetch(nodes[1].host + '/file/1.jpg/container/not-exist?access_key=secret').then(res => {
+          should(res.status).eql(401);
+          done();
+        }).catch(e => {
+          done(e);
+        });
+      });
+
+      it('should return a 401 if access_key is incorrect', done => {
+        fetch(nodes[1].host + '/file/1.jpg/container/test?access_key=secret-falsy').then(res => {
+          should(res.status).eql(401);
+          done();
+        }).catch(e => {
+          done(e);
+        });
+      });
 
       it('should return a 404 if the file does not exist', done => {
-        fetch(nodes[1].host + '/file/container/test/1.jpg').then(res => {
+        fetch(nodes[1].host + '/file/1.jpg/container/test?access_key=secret').then(res => {
           should(res.status).eql(404);
           done();
         }).catch(e => {
@@ -30,7 +57,7 @@ describe('API GET', () => {
       });
 
       it('should get a file with gzip', done => {
-        fetch(nodes[1].host + '/file/container/test/image.jpg').then(res => {
+        fetch(nodes[1].host + '/file/image.jpg/container/test?access_key=secret').then(res => {
           should(res.status).eql(200);
           should(res.headers.get('content-encoding')).eql('gzip');
           done();
@@ -40,7 +67,7 @@ describe('API GET', () => {
       });
 
       it('should set cache-control header', done => {
-        fetch(nodes[1].host + '/file/container/test/image.jpg').then(res => {
+        fetch(nodes[1].host + '/file/image.jpg/container/test?access_key=secret').then(res => {
           should(res.status).eql(200);
           should(res.headers.get('content-encoding')).eql('gzip');
           done();
@@ -50,7 +77,7 @@ describe('API GET', () => {
       });
 
       it('should set cache-control header', done => {
-        fetch(nodes[1].host + '/file/container/test/image.jpg').then(res => {
+        fetch(nodes[1].host + '/file/image.jpg/container/test?access_key=secret').then(res => {
           should(res.status).eql(200);
           should(res.headers.get('cache-control')).be.a.String().and.eql('max-age=7776000,immutable');
           done();
@@ -60,7 +87,7 @@ describe('API GET', () => {
       });
 
       it('should get an image & resize on the fly', done => {
-        fetch(nodes[1].host + '/file/container/test/image.jpg?size=S').then(res => {
+        fetch(nodes[1].host + '/file/image.jpg/container/test?access_key=secret&size=S').then(res => {
           should(res.status).eql(200);
           res.body.pipe(sharp().metadata((err, metadata) => {
               should(err).not.ok();
@@ -75,7 +102,7 @@ describe('API GET', () => {
       });
 
       it('should get an image & not resize on the fly if the size is not specified', done => {
-        fetch(nodes[1].host + '/file/container/test/image.jpg?size=M').then(res => {
+        fetch(nodes[1].host + '/file/image.jpg/container/test?access_key=secret&size=M').then(res => {
           should(res.status).eql(200);
           res.body.pipe(sharp().metadata((err, metadata) => {
               should(err).not.ok();
@@ -92,7 +119,7 @@ describe('API GET', () => {
       describe('Inter-node communication', () => {
 
         it('should get a file not present on current node 100 : 100; 200; [File] 101', done => {
-          fetch(nodes[0].host + '/file/container/test/image.jpg').then(res => {
+          fetch(nodes[0].host + '/file/image.jpg/container/test?access_key=secret').then(res => {
             should(res.status).eql(200);
 
             let pathDir  = path.join(__dirname, 'datasets', 'get', 'data_100', '100-101-200', 'test');
@@ -109,7 +136,7 @@ describe('API GET', () => {
         });
 
         it('should get a file not present on current node 200 : 100; 200; [File] 101', done => {
-          fetch(nodes[2].host + '/file/container/test/image.jpg').then(res => {
+          fetch(nodes[2].host + '/file/image.jpg/container/test?access_key=secret').then(res => {
             should(res.status).eql(200);
 
             let pathDir = path.join(__dirname, 'datasets', 'get', 'data_200', '100-101-200', 'test');
@@ -126,7 +153,7 @@ describe('API GET', () => {
         });
 
         it('should get a file from another node and not save it to the disk (not authorized)', function (done) {
-          fetch(nodes[3].host + '/file/container/do-not-delete/a.png').then(res => {
+          fetch(nodes[3].host + '/file/a.png/container/do-not-delete?access_key=secret2').then(res => {
             should(res.status).eql(200);
 
             let pathDir = path.join(__dirname, 'datasets', 'get', 'data_201', '100-101-200');
@@ -161,8 +188,35 @@ describe('API GET', () => {
 
     describe('GET /file/container/:containerId/:id', () => {
 
+      it('should return a 401 if no access_key', done => {
+        fetch(url + '/file/1.jpg/container/test').then(res => {
+          should(res.status).eql(401);
+          done();
+        }).catch(e => {
+          done(e);
+        });
+      });
+
+      it('should return a 401 if containerId does not exist', done => {
+        fetch(url + '/file/1.jpg/container/container-test?access_key=secret').then(res => {
+          should(res.status).eql(401);
+          done();
+        }).catch(e => {
+          done(e);
+        });
+      });
+
+      it('should return a 401 if access_key is incorrect', done => {
+        fetch(url + '/file/1.jpg/container/test?access_key=test').then(res => {
+          should(res.status).eql(401);
+          done();
+        }).catch(e => {
+          done(e);
+        });
+      });
+
       it('should return a 404 if the file does not exist', done => {
-        fetch(url + '/file/container/test/1.jpg').then(res => {
+        fetch(url + '/file/1.jpg/container/test?access_key=secret').then(res => {
           should(res.status).eql(404);
           done();
         }).catch(e => {
@@ -171,7 +225,7 @@ describe('API GET', () => {
       });
 
       it('should get a file with gzip', done => {
-        fetch(url + '/file/container/test/image.jpg').then(res => {
+        fetch(url + '/file/image.jpg/container/test?access_key=secret').then(res => {
           should(res.status).eql(200);
           should(res.headers.get('content-encoding')).eql('gzip');
           done();
@@ -181,7 +235,7 @@ describe('API GET', () => {
       });
 
       it('should set cache-control header', done => {
-        fetch(url + '/file/container/test/image.jpg').then(res => {
+        fetch(url + '/file/image.jpg/container/test?access_key=secret').then(res => {
           should(res.status).eql(200);
           should(res.headers.get('content-encoding')).eql('gzip');
           done();
@@ -191,7 +245,7 @@ describe('API GET', () => {
       });
 
       it('should set cache-control header', done => {
-        fetch(url + '/file/container/test/image.jpg').then(res => {
+        fetch(url + '/file/image.jpg/container/test?access_key=secret').then(res => {
           should(res.status).eql(200);
           should(res.headers.get('cache-control')).be.a.String().and.eql('max-age=7776000,immutable');
           done();
@@ -201,7 +255,7 @@ describe('API GET', () => {
       });
 
       it('should get an image & resize on the fly', done => {
-        fetch(url + '/file/container/test/image.jpg?size=S').then(res => {
+        fetch(url + '/file/image.jpg/container/test?access_key=secret&size=S').then(res => {
           should(res.status).eql(200);
           res.body.pipe(sharp().metadata((err, metadata) => {
               should(err).not.ok();
@@ -216,7 +270,7 @@ describe('API GET', () => {
       });
 
       it('should get an image & not resize on the fly if the size is not specified', done => {
-        fetch(url + '/file/container/test/image.jpg?size=M').then(res => {
+        fetch(url + '/file/image.jpg/container/test?access_key=secret&size=M').then(res => {
           should(res.status).eql(200);
           res.body.pipe(sharp().metadata((err, metadata) => {
               should(err).not.ok();

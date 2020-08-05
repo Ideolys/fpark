@@ -76,17 +76,23 @@ function runServer (config, callback) {
       throw err;
     }
 
-    server = http.createServer((req, res) => {
-      logger(req, res);
-      router.lookup(req, res);
-    });
-
-    server.listen(CONFIG.SERVER_PORT, err => {
+    auth.loadAccessKeys(path.join(process.cwd(), CONFIG.KEYS_DIRECTORY), err => {
       if (err) {
         throw err;
       }
 
-      console.log('Server listening on: http://localhost:' + CONFIG.SERVER_PORT);
+      server = http.createServer((req, res) => {
+        logger(req, res);
+        router.lookup(req, res);
+      });
+
+      server.listen(CONFIG.SERVER_PORT, err => {
+        if (err) {
+          throw err;
+        }
+
+        console.log('Server listening on: http://localhost:' + CONFIG.SERVER_PORT);
+      });
     });
   });
 }

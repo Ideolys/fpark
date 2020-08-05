@@ -24,6 +24,7 @@ const {
 const isImage = require('../commons/image/utils').isImage;
 
 const kittenLogger = require('kitten-logger');
+const auth = require('../commons/auth');
 const logger       = kittenLogger.createPersistentLogger('get_file');
 
 /**
@@ -32,11 +33,12 @@ const logger       = kittenLogger.createPersistentLogger('get_file');
  * @param {Object} req
  * @param {Object} res
  * @param {Object} params request's params
+ * @param {Object} queryParams query parameters
  * @param {String} keyNodes path 'node1-node2-node3'
  * @param {Array} streams
  * @param {Function} handler handler if error
  */
-function getFile (CONFIG, req, res, params, keyNodes, streams, handler) {
+function getFile (CONFIG, req, res, params, queryParams, keyNodes, streams, handler) {
   function handlerError (err) {
     if (getHeaderNthNode(req.headers) === 3 || getHeaderFromNode(req.headers)) {
       logger.warn({ msg : 'Depth reached', from : getHeaderFromNode(req.headers) }, { idKittenLogger : req.log_id });
@@ -50,15 +52,11 @@ function getFile (CONFIG, req, res, params, keyNodes, streams, handler) {
   let extensionWithoutDot = extension.replace('.', '');
 
   if (isImage(extensionWithoutDot) && req.url) {
-    let query  = url.parse(req.url).search;
+    let sizeId = queryParams.get('size');
+    let size   = getSize(CONFIG, sizeId);
 
-    if (query) {
-      let sizeId = new URLSearchParams(url.parse(req.url).search).get('size');
-      let size   = getSize(CONFIG, sizeId);
-
-      if (size) {
-        streams.unshift(resize(CONFIG, sizeId));
-      }
+    if (size) {
+      streams.unshift(resize(CONFIG, sizeId));
     }
   }
 
@@ -77,90 +75,92 @@ function getFile (CONFIG, req, res, params, keyNodes, streams, handler) {
  * @param {Object} store
  */
 exports.getApi = function getApi (req, res, params, store) {
-  let nodes            = repartition.getNodesToPersistTo(params.id, store.CONFIG.NODES, store.CONFIG.REPLICATION_NB_REPLICAS);
-  let isAllowedToWrite = repartition.isCurrentNodeInPersistentNodes(nodes, store.CONFIG.ID);
+  auth.verifyAccessKey(req, res, params, queryParams => {
+    let nodes            = repartition.getNodesToPersistTo(params.id, store.CONFIG.NODES, store.CONFIG.REPLICATION_NB_REPLICAS);
+    let isAllowedToWrite = repartition.isCurrentNodeInPersistentNodes(nodes, store.CONFIG.ID);
 
-  if (!isAllowedToWrite && nodes.length) {
-    if (getHeaderNthNode(req.headers) === 3) {
-      logger.warn({ msg : 'Depth reached', from : getHeaderFromNode(req.headers) }, { idKittenLogger : req.log_id });
-      return respond(res, 404);
-    }
-
-    return queue(nodes, (node, next) => {
-      if (node.id === store.CONFIG.ID) {
-        return next();
-      }
-
-      let proxy = proxyFactory(() => {
+    if (!isAllowedToWrite && nodes.length) {
+      if (getHeaderNthNode(req.headers) === 3) {
+        logger.warn({ msg : 'Depth reached', from : getHeaderFromNode(req.headers) }, { idKittenLogger : req.log_id });
         return respond(res, 404);
-      });
-
-      let headers = {};
-      setHeaderNthNode(headers, req.headers);
-      setHeaderCurrentNode(headers, store.CONFIG.ID);
-
-      proxy(req, res, {
-        selfHandleResponse : true,
-        target             : node.host,
-        headers
-      });
-    }, () => {
-      logger.warn({ msg : 'Cannot proxy',  }, { idKittenLogger : req.log_id });
-      respond(res, 500);
-    });
-  }
-
-  let keyNodes = repartition.flattenNodes(nodes);
-
-  res.setHeader('Cache-Control', 'max-age=' + store.CONFIG.CACHE_CONTROL_MAX_AGE + ',immutable');
-  res.setHeader('Content-Encoding', 'gzip');
-
-  getFile(store.CONFIG, req, res, params, keyNodes, [zlib.createGzip()], () => {
-    if (!nodes.length) {
-      return respond(res, 404);
-    }
-
-    let headers =  {
-      'accept-encoding' : 'gzip'
-    };
-    setHeaderCurrentNode(headers, store.CONFIG.ID);
-
-    // Try to get file from another node
-    // Save it
-    // Serve it
-    queue(nodes, (node, next) => {
-      if (node.id === store.CONFIG.ID) {
-        return next();
       }
 
-      setHeaderNthNode(headers);
-
-      let _req =  {
-        method : 'GET',
-        headers,
-      };
-
-      fetch(node.host + req.url, _req).then((resRequest) => {
-        if (resRequest.status !== 200) {
+      return queue(nodes, (node, next) => {
+        if (node.id === store.CONFIG.ID) {
           return next();
         }
 
-        putFile(resRequest.body, params, store, keyNodes, null, err => {
-          if (err) {
-            logger.warn({ msg : 'Cannot get file', err }, { idKittenLogger : req.log_id });
-            return respond(res, 500);
+        let proxy = proxyFactory(() => {
+          return respond(res, 404);
+        });
+
+        let headers = {};
+        setHeaderNthNode(headers, req.headers);
+        setHeaderCurrentNode(headers, store.CONFIG.ID);
+
+        proxy(req, res, {
+          selfHandleResponse : true,
+          target             : node.host,
+          headers
+        });
+      }, () => {
+        logger.warn({ msg : 'Cannot proxy',  }, { idKittenLogger : req.log_id });
+        respond(res, 500);
+      });
+    }
+
+    let keyNodes = repartition.flattenNodes(nodes);
+
+    res.setHeader('Cache-Control', 'max-age=' + store.CONFIG.CACHE_CONTROL_MAX_AGE + ',immutable');
+    res.setHeader('Content-Encoding', 'gzip');
+
+    getFile(store.CONFIG, req, res, params, queryParams, keyNodes, [zlib.createGzip()], () => {
+      if (!nodes.length) {
+        return respond(res, 404);
+      }
+
+      let headers =  {
+        'accept-encoding' : 'gzip'
+      };
+      setHeaderCurrentNode(headers, store.CONFIG.ID);
+
+      // Try to get file from another node
+      // Save it
+      // Serve it
+      queue(nodes, (node, next) => {
+        if (node.id === store.CONFIG.ID) {
+          return next();
+        }
+
+        setHeaderNthNode(headers);
+
+        let _req =  {
+          method : 'GET',
+          headers,
+        };
+
+        fetch(node.host + req.url, _req).then((resRequest) => {
+          if (resRequest.status !== 200) {
+            return next();
           }
 
-          getFile(store.CONFIG, _req, res, params, keyNodes, [], () => {
-            respond(res, 404);
+          putFile(resRequest.body, params, store, keyNodes, null, err => {
+            if (err) {
+              logger.warn({ msg : 'Cannot get file', err }, { idKittenLogger : req.log_id });
+              return respond(res, 500);
+            }
+
+            getFile(store.CONFIG, _req, res, params, queryParams, keyNodes, [], () => {
+              respond(res, 404);
+            });
           });
+        }).catch(() => {
+          next();
         });
-      }).catch(() => {
-        next();
+      }, () => {
+        // No file has been found
+        respond(res, 404);
       });
-    }, () => {
-      // No file has been found
-      respond(res, 404);
     });
   });
 }
