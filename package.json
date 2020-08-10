@@ -1,10 +1,9 @@
 {
   "name": "fpark",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "main": "index.js",
   "scripts": {
-    "test": "mocha tests/test.*.js -w",
-    "build": "pkg -t node12-linux --out-path ./build ."
+    "test": "mocha tests/test.*.js -w"
   },
   "bin": {
     "fpark": "./fpark"
