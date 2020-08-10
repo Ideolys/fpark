@@ -155,27 +155,51 @@ exports.putApi = function put (req, res, params, store) {
       return respond(res, 500);
     }
 
+    let isWritePending = false;
+    let isDone         = false;
+
+    function done () {
+      if (isDone || isWritePending) {
+        return;
+      }
+
+      isDone = true;
+      req.unpipe(busboy);
+      respond(...arguments);
+    }
+
     busboy.on('file', (fieldname, fileStream, filename, encoding, mimetype) => {
       if (!filename) {
-        return respond(res, 500);
+        fileStream.resume();
+        return done(res, 500);
       }
+
+      isWritePending = true;
+
+      fileStream.on('error', () => {
+        isWritePending = false;
+        return done(res, 500);
+      });
 
       /**
        * File size reached
        * https://github.com/mscdex/busboy/blob/967fce0db075cb02765814db3e322d4f64d33a42/lib/types/multipart.js#L221
        */
       fileStream.on('limit', () => {
-        return respond(res, 413);
+        isWritePending = false;
+        return done(res, 413);
       });
 
       putFile(fileStream, params, store, keyNodes, getHeaderReplication(req.headers), (err) => {
         if (err) {
           logger.warn({ msg : 'Cannot put file', err }, { idKittenLogger : req.log_id });
-          return respond(res, 500);
+          isWritePending = false;
+          return done(res, 500);
         }
 
         if (getHeaderFromNode(req.headers) && !req.headers['x-forwarded-for']) {
-          return respond(res, 200);
+          isWritePending = false;
+          return done(res, 200);
         }
 
         let headers =  {
@@ -205,19 +229,26 @@ exports.putApi = function put (req, res, params, store) {
               return next();
             }
 
-            respond(res, 200);
+            isWritePending = false;
+            done(res, 200);
           }).catch(() => {
             next();
           })
         }, () => {
-          respond(res, nodes.length ? 500 : 200);
+          isWritePending = false;
+          done(res, nodes.length ? 500 : 200);
         });
       });
     });
 
-    busboy.on('error' , err => {
-      logger.warn({ msg : 'Cannot put file', err }, { idKittenLogger : req.log_id });
-      respond(res, 500);
+    busboy.on('error', err => {
+      logger.warn({ msg : 'Cannot put file', err : err.message }, { idKittenLogger : req.log_id });
+      isWritePending = false;
+      done(res, 500);
+    });
+
+    busboy.on('finish', () => {
+      done(res, 200);
     });
 
     req.pipe(busboy);
