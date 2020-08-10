@@ -3,11 +3,20 @@ Description=fpark
 After=network.target
 
 [Service]
-Type=forking
 WorkingDirectory=/var/www/fpark
 User=fpark
 ExecStart=/var/www/fpark/sharp/build/Release/fpark start -c fpark.config.json
 Restart=always
+ProtectControlGroups=true
+ProtectHostname=true
+ProtectHome=true
+ProtectKernelModules=true
+ProtectKernelTunables=true
+ProtectSystem=full
+LockPersonality=true
+RestrictSUIDSGID=true
+SystemCallArchitectures=native
+NoNewPrivileges=true
 
 [Install]
 WantedBy=multi-user.target

@@ -3,7 +3,8 @@
   "version": "0.3.0",
   "main": "index.js",
   "scripts": {
-    "test": "mocha tests/test.*.js -w"
+    "test": "mocha tests/test.*.js -w",
+    "build": "pkg -t node12-linux --out-path ./build ."
   },
   "bin": {
     "fpark": "./fpark"
