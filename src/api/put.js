@@ -152,6 +152,7 @@ exports.putApi = function put (req, res, params, store) {
       });
     }
     catch (e) {
+      logger.error({ msg : 'Cannot put file', err : e.message }, { idKittenLogger : req.log_id });
       return respond(res, 500);
     }
 
@@ -170,13 +171,15 @@ exports.putApi = function put (req, res, params, store) {
 
     busboy.on('file', (fieldname, fileStream, filename, encoding, mimetype) => {
       if (!filename) {
+        logger.error({ msg : 'Cannot put file: no filename' }, { idKittenLogger : req.log_id });
         fileStream.resume();
         return done(res, 500);
       }
 
       isWritePending = true;
 
-      fileStream.on('error', () => {
+      fileStream.on('error', err => {
+        logger.error({ msg : 'Cannot put file', err : err.message }, { idKittenLogger : req.log_id });
         isWritePending = false;
         return done(res, 500);
       });
@@ -186,6 +189,7 @@ exports.putApi = function put (req, res, params, store) {
        * https://github.com/mscdex/busboy/blob/967fce0db075cb02765814db3e322d4f64d33a42/lib/types/multipart.js#L221
        */
       fileStream.on('limit', () => {
+        logger.warn({ msg : 'Cannot put file: limit reached' }, { idKittenLogger : req.log_id });
         isWritePending = false;
         return done(res, 413);
       });
@@ -242,7 +246,7 @@ exports.putApi = function put (req, res, params, store) {
     });
 
     busboy.on('error', err => {
-      logger.warn({ msg : 'Cannot put file', err : err.message }, { idKittenLogger : req.log_id });
+      logger.error({ msg : 'Cannot put file', err : err.message }, { idKittenLogger : req.log_id });
       isWritePending = false;
       done(res, 500);
     });
