@@ -113,6 +113,7 @@ exports.getApi = function getApi (req, res, params, store) {
 
     res.setHeader('Cache-Control', 'max-age=' + store.CONFIG.CACHE_CONTROL_MAX_AGE + ',immutable');
     res.setHeader('Content-Encoding', 'gzip');
+    res.setHeader('Content-Disposition', 'inline; filename="' + params.id + '"');
 
     getFile(store.CONFIG, req, res, params, queryParams, keyNodes, [zlib.createGzip()], () => {
       if (!nodes.length) {

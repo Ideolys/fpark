@@ -234,10 +234,10 @@ describe('API GET', () => {
         })
       });
 
-      it('should set cache-control header', done => {
+      it('should set content-disposition header', done => {
         fetch(url + '/file/image.jpg/container/test?access_key=secret').then(res => {
           should(res.status).eql(200);
-          should(res.headers.get('content-encoding')).eql('gzip');
+          should(res.headers.get('content-disposition')).eql('inline; filename="image.jpg"');
           done();
         }).catch(e => {
           done(e);
