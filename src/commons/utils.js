@@ -37,16 +37,6 @@ module.exports = {
   },
 
   /**
-   * Pad by zero a string to specified length
-   * @param {String} n
-   * @param {Int} length
-   */
-  padlz : function(n, length) {
-    for (n+=""; n.length < length; n = "0" + n);
-    return n;
-  },
-
-  /**
    * Queue
    * @param {Array} items
    * @param {Function} handler function to handle item in items -> handler(item, next {Function})

@@ -1,6 +1,5 @@
 const fs         = require('fs');
 const path       = require('path');
-const { padlz }  = require('./utils');
 const encryption = require('../commons/encryption');
 
 module.exports = {
@@ -12,11 +11,17 @@ module.exports = {
    * @returns {String}
    */
   getFileName (filename, length) {
-    if (filename.length < length) {
-      return padlz(filename, length);
+    let _bufferString = Buffer.from(filename);
+
+    if (_bufferString.length >= length) {
+      return _bufferString.slice(0, length).toString('ascii');
     }
 
-    return filename.substr(0, length);
+    let _buffer = Buffer.alloc(length);
+    _buffer.fill('0');
+    _bufferString.copy(_buffer, length - _bufferString.length);
+
+    return _buffer.toString('ascii');
   },
 
   /**
