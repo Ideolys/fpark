@@ -24,7 +24,7 @@ const {
 const isImage = require('../commons/image/utils').isImage;
 
 const kittenLogger = require('kitten-logger');
-const auth = require('../commons/auth');
+const auth         = require('../commons/auth');
 const logger       = kittenLogger.createPersistentLogger('get_file');
 
 /**
@@ -60,7 +60,7 @@ function getFile (CONFIG, req, res, params, queryParams, keyNodes, streams, hand
     }
   }
 
-  let preparedStreams = file.prepareStreams(CONFIG, keyNodes, params, streams, handlerError);
+  let preparedStreams = file.prepareStreams(CONFIG, keyNodes, params, streams, handlerError, req.url);
 
   if (res) {
     preparedStreams.pipe(res);
@@ -136,8 +136,9 @@ exports.getApi = function getApi (req, res, params, store) {
         setHeaderNthNode(headers);
 
         let _req =  {
-          method : 'GET',
           headers,
+          method : 'GET',
+          url    : req.url
         };
 
         fetch(node.host + req.url, _req).then((resRequest) => {
@@ -151,7 +152,7 @@ exports.getApi = function getApi (req, res, params, store) {
               return respond(res, 500);
             }
 
-            getFile(store.CONFIG, _req, res, params, queryParams, keyNodes, [], () => {
+            getFile(store.CONFIG, _req, res, params, queryParams, keyNodes, [zlib.createGzip()], () => {
               respond(res, 404);
             });
           });

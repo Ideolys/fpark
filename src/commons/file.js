@@ -1,6 +1,11 @@
 const fs         = require('fs');
 const path       = require('path');
 const encryption = require('../commons/encryption');
+const Cache      = require('streaming-cache');
+
+let cache = new Cache({
+  maxAge : 1000 * 60 * 60
+});
 
 module.exports = {
 
@@ -47,10 +52,18 @@ module.exports = {
    * @param {Object} params
    * @param {Array} streams array of Stream object to pipe to file read stream
    * @param {Function} handlerError
+   * @param {String} cacheKey
    * @returns {WritableStream}
    */
-  prepareStreams (CONFIG, nodes, params, streams, handlerError) {
-    let paths      = this.getFilePath(CONFIG, nodes, params);
+  prepareStreams (CONFIG, nodes, params, streams, handlerError, cacheKey) {
+    let paths = this.getFilePath(CONFIG, nodes, params);
+
+    if (cache.exists(cacheKey)) {
+      let cacheValue = cache.get(cacheKey);
+      cacheValue.on('error', handlerError);
+      return cacheValue;
+    }
+
     let fileStream = fs.createReadStream(paths.path);
 
     let decryptStream = encryption.decryptStream(
@@ -59,14 +72,28 @@ module.exports = {
       CONFIG.ENCRYPTION_ALGORITHM
     );
 
-    fileStream.on('error', handlerError);
-    decryptStream.on('error', handlerError);
+    function cacheHandlerError (e) {
+      cache.del(cacheKey);
+      handlerError(e)
+    }
+
+    fileStream.on('error', cacheHandlerError);
+    decryptStream.on('error', cacheHandlerError);
 
     let pipedStreams = fileStream.pipe(decryptStream);
+    let cacheValue = null;
+
+    try {
+      cacheValue = cache.set(cacheKey);
+    }
+    catch (e) {
+      cacheHandlerError();
+    }
+    streams.push(cacheValue);
 
     for (let i = 0; i < streams.length; i++) {
       let stream = streams[i];
-      stream.on('error', handlerError);
+      stream.on('error', cacheHandlerError);
       pipedStreams = pipedStreams.pipe(stream);
     }
 
