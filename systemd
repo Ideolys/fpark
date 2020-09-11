@@ -5,7 +5,7 @@ After=network.target
 [Service]
 WorkingDirectory=/var/www/fpark
 User=fpark
-ExecStart=/var/www/fpark/fparkPKG start -c fpark.config.json
+ExecStart=/var/www/fpark/fpark start -c fpark.config.json
 Restart=always
 ProtectControlGroups=true
 ProtectHostname=true
