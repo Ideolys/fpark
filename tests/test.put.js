@@ -11,7 +11,7 @@ const file     = require('../src/commons/file');
 
 describe('API PUT', () => {
 
-  describe('PUT /file/:id/container/:containerId', () => {
+  describe('PUT /c/:containerId/f/:id', () => {
 
     describe('Multi-nodes', () => {
 
@@ -31,7 +31,7 @@ describe('API PUT', () => {
 
           let headers = {};
 
-          fetch(nodes[1].host + '/file/file.txt/container/test', {
+          fetch(nodes[1].host + '/c/test/f/file.txt', {
             method  : 'PUT',
             body    : formData,
             headers
@@ -50,7 +50,7 @@ describe('API PUT', () => {
           let headers = {};
           utils.setJWTHeader(headers, 'test', path.join(__dirname, 'datasets', '_keys', 'key_2.pem'));
 
-          fetch(nodes[1].host + '/file/file.txt/container/test', {
+          fetch(nodes[1].host + '/c/test/f/file.txt', {
             method  : 'PUT',
             body    : formData,
             headers
@@ -69,7 +69,7 @@ describe('API PUT', () => {
           let headers = {};
           utils.setJWTHeader(headers, 'test', path.join(__dirname, 'datasets', '_keys', 'key_2.pem'));
 
-          fetch(nodes[1].host + '/file/file.txt/container/test_2', {
+          fetch(nodes[1].host + '/c/test_2/f/file.txt', {
             method  : 'PUT',
             body    : formData,
             headers
@@ -88,7 +88,7 @@ describe('API PUT', () => {
           let headers = {};
           utils.setJWTHeader(headers, 'test', path.join(__dirname, 'datasets', '_keys', 'test.pem'));
 
-          fetch(nodes[1].host + '/file/file.txt/container/test', {
+          fetch(nodes[1].host + '/c/test/f/file.txt', {
             method  : 'PUT',
             body    : formData,
             headers
@@ -120,7 +120,7 @@ describe('API PUT', () => {
           let headers = {};
           utils.setJWTHeader(headers, 'test', path.join(__dirname, 'datasets', '_keys', 'test.pem'));
 
-          fetch(nodes[2].host + '/file/file.txt/container/test', {
+          fetch(nodes[2].host + '/c/test/f/file.txt', {
             method  : 'PUT',
             body    : formData,
             headers
@@ -151,7 +151,7 @@ describe('API PUT', () => {
           let headers = {};
           utils.setJWTHeader(headers, 'test', path.join(__dirname, 'datasets', '_keys', 'test.pem'));
 
-          fetch(nodes[0].host + '/file/file.txt/container/test', {
+          fetch(nodes[0].host + '/c/test/f/file.txt', {
             method  : 'PUT',
             body    : formData,
             headers
@@ -221,7 +221,7 @@ describe('API PUT', () => {
           let headers = {};
           utils.setJWTHeader(headers, 'test', path.join(__dirname, 'datasets', '_keys', 'test.pem'));
 
-          fetch(nodes[1].host + '/file/image.jpg/container/test', {
+          fetch(nodes[1].host + '/c/test/f/image.jpg', {
             method  : 'PUT',
             body    : formData,
             headers
@@ -256,7 +256,7 @@ describe('API PUT', () => {
           let headers = {};
           utils.setJWTHeader(headers, 'test', path.join(__dirname, 'datasets', '_keys', 'test.pem'));
 
-          fetch(nodes[1].host + '/file/' + filenameOriginal + '/container/test', {
+          fetch(nodes[1].host + '/c/test/f/' + filenameOriginal + '', {
             method  : 'PUT',
             body    : formData,
             headers
@@ -314,7 +314,7 @@ describe('API PUT', () => {
           let headers = {};
           utils.setJWTHeader(headers, 'test', path.join(__dirname, 'datasets', '_keys', 'test.pem'));
 
-          fetch(nodes[0].host + '/file/' + filenameOriginal +  '/container/test', {
+          fetch(nodes[0].host + '/c/test/f/' + filenameOriginal +  '', {
             method  : 'PUT',
             body    : formData,
             headers
@@ -372,7 +372,7 @@ describe('API PUT', () => {
           let headers = {};
           utils.setJWTHeader(headers, 'test', path.join(__dirname, 'datasets', '_keys', 'test.pem'));
 
-          fetch(nodes[0].host + '/file/' + filenameOriginal + '/container/test', {
+          fetch(nodes[0].host + '/c/test/f/' + filenameOriginal + '', {
             method  : 'PUT',
             body    : formData,
             headers
@@ -430,7 +430,7 @@ describe('API PUT', () => {
           let headers = formData.getHeaders();
           utils.setJWTHeader(headers, 'test', path.join(__dirname, 'datasets', '_keys', 'test.pem'));
 
-          fetch(nodes[0].host + '/file/' + filenameOriginal + '/container/test', {
+          fetch(nodes[0].host + '/c/test/f/' + filenameOriginal + '', {
             method  : 'PUT',
             body    : formData,
             headers
@@ -485,7 +485,7 @@ describe('API PUT', () => {
           let headers = {};
           utils.setJWTHeader(headers, 'test', path.join(__dirname, 'datasets', '_keys', 'test.pem'));
 
-          fetch(nodes[1].host + '/file/' + filenameOriginal +  '/container/test', {
+          fetch(nodes[1].host + '/c/test/f/' + filenameOriginal +  '', {
             method  : 'PUT',
             body    : formData,
             headers
@@ -545,7 +545,7 @@ describe('API PUT', () => {
             let headers = {};
             utils.setJWTHeader(headers, 'test', path.join(__dirname, 'datasets', '_keys', 'test.pem'));
 
-            fetch(nodes[0].host + '/file/' + file + '/container/test', {
+            fetch(nodes[0].host + '/c/test/f/' + file + '', {
               method : 'PUT',
               body   : formData,
               headers
@@ -584,7 +584,7 @@ describe('API PUT', () => {
 
           let headers = {};
 
-          fetch(url + '/file/file.txt/container/test', {
+          fetch(url + '/c/test/f/file.txt', {
             method  : 'PUT',
             body    : formData,
             headers
@@ -603,7 +603,7 @@ describe('API PUT', () => {
           let headers = {};
           utils.setJWTHeader(headers, 'test', path.join(__dirname, 'datasets', '_keys', 'key_2.pem'));
 
-          fetch(url + '/file/file.txt/container/test', {
+          fetch(url + '/c/test/f/file.txt', {
             method  : 'PUT',
             body    : formData,
             headers
@@ -622,7 +622,7 @@ describe('API PUT', () => {
           let headers = {};
           utils.setJWTHeader(headers, 'test', path.join(__dirname, 'datasets', '_keys', 'key_2.pem'));
 
-          fetch(url + '/file/file.txt/container/test_2', {
+          fetch(url + '/c/test_2/f/file.txt', {
             method  : 'PUT',
             body    : formData,
             headers
@@ -641,7 +641,7 @@ describe('API PUT', () => {
           let headers = {};
           utils.setJWTHeader(headers, 'test', path.join(__dirname, 'datasets', '_keys', 'test.pem'));
 
-          fetch(url + '/file/file.txt/container/test', {
+          fetch(url + '/c/test/f/file.txt', {
             method  : 'PUT',
             body    : formData,
             headers
@@ -667,7 +667,7 @@ describe('API PUT', () => {
           let headers = {};
           utils.setJWTHeader(headers, 'test', path.join(__dirname, 'datasets', '_keys', 'test.pem'));
 
-          fetch(url + '/file/file.txt/container/test', {
+          fetch(url + '/c/test/f/file.txt', {
             method  : 'PUT',
             body    : formData,
             headers
@@ -720,7 +720,7 @@ describe('API PUT', () => {
           let headers = {};
           utils.setJWTHeader(headers, 'test', path.join(__dirname, 'datasets', '_keys', 'test.pem'));
 
-          fetch(url + '/file/image.jpg/container/test', {
+          fetch(url + '/c/test/f/image.jpg', {
             method  : 'PUT',
             body    : formData,
             headers
@@ -749,7 +749,7 @@ describe('API PUT', () => {
           let headers = {};
           utils.setJWTHeader(headers, 'test', path.join(__dirname, 'datasets', '_keys', 'test.pem'));
 
-          fetch(url + '/file/' + filenameOriginal + '/container/test', {
+          fetch(url + '/c/test/f/' + filenameOriginal + '', {
             method  : 'PUT',
             body    : formData,
             headers
@@ -790,7 +790,7 @@ describe('API PUT', () => {
           let headers = {};
           utils.setJWTHeader(headers, 'test', path.join(__dirname, 'datasets', '_keys', 'test.pem'));
 
-          fetch(url + '/file/' + filenameOriginal + '/container/test', {
+          fetch(url + '/c/test/f/' + filenameOriginal + '', {
             method  : 'PUT',
             body    : formData,
             headers
@@ -831,7 +831,7 @@ describe('API PUT', () => {
           let headers = {};
           utils.setJWTHeader(headers, 'test', path.join(__dirname, 'datasets', '_keys', 'test.pem'));
 
-          fetch(url + '/file/' + filenameOriginal + '/container/test', {
+          fetch(url + '/c/test/f/' + filenameOriginal + '', {
             method  : 'PUT',
             body    : formData,
             headers
@@ -872,7 +872,7 @@ describe('API PUT', () => {
           let headers = formData.getHeaders();
           utils.setJWTHeader(headers, 'test', path.join(__dirname, 'datasets', '_keys', 'test.pem'));
 
-          fetch(url + '/file/' + filenameOriginal + '/container/test', {
+          fetch(url + '/c/test/f/' + filenameOriginal + '', {
             method  : 'PUT',
             body    : formData,
             headers
@@ -911,7 +911,7 @@ describe('API PUT', () => {
           let headers = {};
           utils.setJWTHeader(headers, 'test', path.join(__dirname, 'datasets', '_keys', 'test.pem'));
 
-          fetch(url + '/file/' + filenameOriginal + '/container/test', {
+          fetch(url + '/c/test/f/' + filenameOriginal + '', {
             method  : 'PUT',
             body    : formData,
             headers
@@ -963,7 +963,7 @@ describe('API PUT', () => {
           let headers = {};
           utils.setJWTHeader(headers, 'test', path.join(__dirname, 'datasets', '_keys', 'test.pem'));
 
-          fetch(url + '/file/' + file + '/container/test', {
+          fetch(url + '/c/test/f/' + file + '', {
             method : 'PUT',
             body   : formData,
             headers

@@ -8,7 +8,7 @@ const FormData = require('form-data');
 
 describe('API PUT - nodes down', () => {
 
-  describe('PUT /file/:id/container/:containerId', () => {
+  describe('PUT /c/:containerId/f/:id', () => {
 
     describe('Document', () => {
 
@@ -23,7 +23,7 @@ describe('API PUT - nodes down', () => {
           let headers = {};
           utils.setJWTHeader(headers, 'test', path.join(__dirname, 'datasets', '_keys', 'test.pem'));
 
-          fetch(nodes[1].host + '/file/file.txt/container/test', {
+          fetch(nodes[1].host + '/c/test/f/file.txt', {
             method  : 'PUT',
             body    : formData,
             headers
@@ -63,7 +63,7 @@ describe('API PUT - nodes down', () => {
           let formData = new FormData();
           formData.append('file', fs.createReadStream(path.join(__dirname, 'datasets', '_documents', 'file.txt')));
 
-          fetch(nodes[0].host + '/file/file.txt/container/test', {
+          fetch(nodes[0].host + '/c/test/f/file.txt', {
             method  : 'PUT',
             body    : formData
           }).then(res => {

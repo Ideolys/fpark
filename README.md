@@ -106,7 +106,7 @@ vi config.json
 
 ### API
 
-#### GET /file/:filename/container/:container
+#### GET /c/:container/f/:filename
 
 The url is **public**.
 
@@ -118,13 +118,13 @@ Query options for the url are:
 - `access_key` : access key to get a file for a container. It is mandatory. The key is given at the creation of the container (see Container creation).
 - `size` : a valid size in `config.SIZES` to resize on the fly a file of type image.
 
-#### PUT /file/:filename/container/:container
+#### PUT /c/:container/f/:filename
 
 Put a file with id `filename` to a container `container`.
 
 A JsonWebToken token issued by `container` is required to perform the action. See Token section.
 
-#### DELETE /file/:filename/container/:container
+#### DELETE /c/:container/f/:filename
 
 Delete a file given by `filename` from a container `container`.
 
@@ -150,7 +150,7 @@ The url can be disabled with `IS_REGISTRATION_ENABLED`.
 
 Only the owner of a container can PUT and DELETE files. Make sure to always define the token as follows:
 
-  1. Register a container by calling the API `POST /node/register` **or** put the public key of the container in the keys directory as `container.pub` where `container` is the name of the container to create and set an access key for the container in a file as `contaiener.access_key`.
+  1. Register a container by calling the API `POST /node/register` **or** put the public key of the container in the keys directory as `container.pub` where `container` is the name of the container to create and set an access key for the container in a file as `container.access_key`.
   1. Create a JsonWebToken token with the field `aud` equals to the registered `container`.
   1. Add the token in the header `authorization` as `Authorization: Bearer <token>`.
 

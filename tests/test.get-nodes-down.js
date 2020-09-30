@@ -7,14 +7,14 @@ const nodes  = config.NODES;
 
 describe('API GET : nodes down', () => {
 
-  describe('GET /file/:id/container/:containerId with nodes down', () => {
+  describe('GET /c/:containerId/f/:id with nodes down', () => {
 
     it('should return a 404 if the file does not exist', done => {
       utils.runArchi('get', [
           ['start', '-c', path.join('..', 'configs', '100.json')]
         , ['start', '-c', path.join('..', 'configs', '101.json')]
       ], () => {
-        fetch(nodes[1].host + '/file/1.jpg/container/test?access_key=secret').then(res => {
+        fetch(nodes[1].host + '/c/test/f/1.jpg?access_key=secret').then(res => {
           should(res.status).eql(404);
           utils.stopArchi(done);
         }).catch(e => {
@@ -31,7 +31,7 @@ describe('API GET : nodes down', () => {
         , ['start', '-c', path.join('..', 'configs', '101.json')]
         , ['start', '-c', path.join('..', 'configs', '201.json')]
       ], () => {
-        fetch(nodes[0].host + '/file/image.jpg/container/test?access_key=secret').then(res => {
+        fetch(nodes[0].host + '/c/test/f/image.jpg?access_key=secret').then(res => {
           should(res.status).eql(200);
 
           let pathDir  = path.join(__dirname, 'datasets', 'get', 'data_100', '100-101-200', 'test');
@@ -57,7 +57,7 @@ describe('API GET : nodes down', () => {
         , ['start', '-c', path.join('..', 'configs', '201.json')]
       ], () => {
 
-        fetch(nodes[2].host + '/file/image.jpg/container/test?access_key=secret').then(res => {
+        fetch(nodes[2].host + '/c/test/f/image.jpg?access_key=secret').then(res => {
           should(res.status).eql(200);
 
           let pathDir = path.join(__dirname, 'datasets', 'get', 'data_200', '100-101-200', 'test');

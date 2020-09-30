@@ -7,7 +7,7 @@ const nodes  = config.NODES;
 const { runArchi, stopArchi, deleteFolderRecursive, setJWTHeader, getFileHash } = require('./utils');
 const { createDirIfNotExistsSync } = require('../src/commons/utils');
 
-describe('DEL /file/container/:containerId/:id', () => {
+describe('DEL /c/:containerId/f/:id', () => {
 
   describe('multi-nodes', () => {
 
@@ -24,7 +24,7 @@ describe('DEL /file/container/:containerId/:id', () => {
       });
 
       it('should not be allowed to delete a file if no token is provided', done => {
-        fetch(nodes[0].host + '/file/file.txt/container/test', {
+        fetch(nodes[0].host + '/c/test/f/file.txt', {
           method  : 'DELETE'
         }).then(res => {
           should(res.status).eql(401);
@@ -38,7 +38,7 @@ describe('DEL /file/container/:containerId/:id', () => {
         let headers = {};
         setJWTHeader(headers, 'test_2', path.join(__dirname, 'datasets', '_keys', 'key_2.pem'));
 
-        fetch(nodes[0].host + '/file/file.txt/container/test', {
+        fetch(nodes[0].host + '/c/test/f/file.txt', {
           method  : 'DELETE',
           headers
         }).then(res => {
@@ -53,7 +53,7 @@ describe('DEL /file/container/:containerId/:id', () => {
         let headers = {};
         setJWTHeader(headers, 'test', path.join(__dirname, 'datasets', '_keys', 'test.pem'));
 
-        fetch(nodes[0].host + '/file/file.txt/container/test_2', {
+        fetch(nodes[0].host + '/c/test_2/f/file.txt', {
           method  : 'DELETE',
           headers
         }).then(res => {
@@ -79,7 +79,7 @@ describe('DEL /file/container/:containerId/:id', () => {
       setJWTHeader(headers, 'test', path.join(__dirname, 'datasets', '_keys', 'test.pem'));
 
       it('should not delete a file that does not exist', done => {
-        fetch(nodes[0].host + '/file/a.png/container/test', {
+        fetch(nodes[0].host + '/c/test/f/a.png', {
           method  : 'DELETE',
           headers
         }).then(res => {
@@ -110,7 +110,7 @@ describe('DEL /file/container/:containerId/:id', () => {
         fs.writeFileSync(filePath200, fs.readFileSync(sourcePath));
         fs.writeFileSync(filePath201, fs.readFileSync(sourcePath));
 
-        fetch(nodes[1].host + '/file/file.txt/container/test', {
+        fetch(nodes[1].host + '/c/test/f/file.txt', {
           method  : 'DELETE',
           headers
         }).then(res => {
@@ -153,7 +153,7 @@ describe('DEL /file/container/:containerId/:id', () => {
         fs.writeFileSync(filePath200, fs.readFileSync(sourcePath));
         fs.writeFileSync(filePath201, fs.readFileSync(sourcePath));
 
-        fetch(nodes[0].host + '/file/file.txt/container/test', {
+        fetch(nodes[0].host + '/c/test/f/file.txt', {
           method  : 'DELETE',
           headers
         }).then(res => {
@@ -202,7 +202,7 @@ describe('DEL /file/container/:containerId/:id', () => {
           fs.writeFileSync(filePath101, fs.readFileSync(sourcePath));
           fs.writeFileSync(filePath201, fs.readFileSync(sourcePath));
 
-          fetch(nodes[1].host + '/file/file.txt/container/test', {
+          fetch(nodes[1].host + '/c/test/f/file.txt', {
             method  : 'DELETE',
             headers
           }).then(res => {
@@ -243,7 +243,7 @@ describe('DEL /file/container/:containerId/:id', () => {
     describe('auth', () => {
 
       it('should not be allowed to delete a file if no token is provided', done => {
-        fetch(url + '/file/file.txt/container/test', {
+        fetch(url + '/c/test/f/file.txt', {
           method  : 'DELETE'
         }).then(res => {
           should(res.status).eql(401);
@@ -257,7 +257,7 @@ describe('DEL /file/container/:containerId/:id', () => {
         let headers = {};
         setJWTHeader(headers, 'test_2', path.join(__dirname, 'datasets', '_keys', 'key_2.pem'));
 
-        fetch(url + '/file/file.txt/container/test', {
+        fetch(url + '/c/test/f/file.txt', {
           method  : 'DELETE',
           headers
         }).then(res => {
@@ -272,7 +272,7 @@ describe('DEL /file/container/:containerId/:id', () => {
         let headers = {};
         setJWTHeader(headers, 'test', path.join(__dirname, 'datasets', '_keys', 'test.pem'));
 
-        fetch(url + '/file/file.txt/container/test_2', {
+        fetch(url + '/c/test_2/f/file.txt', {
           method  : 'DELETE',
           headers
         }).then(res => {
@@ -288,7 +288,7 @@ describe('DEL /file/container/:containerId/:id', () => {
     setJWTHeader(headers, 'test', path.join(__dirname, 'datasets', '_keys', 'test.pem'));
 
     it('should not delete a file that does not exist', done => {
-      fetch(nodes[0].host + '/file/a.png/container/test', {
+      fetch(nodes[0].host + '/c/test/f/a.png', {
         method  : 'DELETE',
         headers
       }).then(res => {
@@ -310,7 +310,7 @@ describe('DEL /file/container/:containerId/:id', () => {
 
       fs.writeFileSync(filePath1, fs.readFileSync(sourcePath));
 
-      fetch(url + '/file/file.txt/container/test', {
+      fetch(url + '/c/test/f/file.txt', {
         method  : 'DELETE',
         headers
       }).then(res => {
