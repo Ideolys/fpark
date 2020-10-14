@@ -190,7 +190,7 @@ In multiple instances configuration, an uploaded file is saved on a certain amou
 ### Cluster & File replication
 
 Fpark replicates files among a number of Fpark instances (`REPLICATION_NB_REPLICAS`). When a file is uploaded, Fpark:
-1. determine the nodes to save the file.
+1. determines the nodes to save the file to.
 1. makes a hash of the filename (`HASH_ALGORITHM`, `HASH_SECRET`).
 1. encrypts the content of the file with the filename (`ENCRYPTION_IV`, `ENCRYPTION_IV_LENGTH`, `ENCRYPTION_ALGORITHM`).
 1. saves the file to the determined nodes.
