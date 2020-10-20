@@ -27,7 +27,7 @@ module.exports = function nodRegister (req, res, params, store) {
       }
 
       let _filename = _body.container;
-      if (typeof _body.container === 'string') {
+      if (typeof _body.container === 'string' && _body.container.includes('/')) {
         console.log('Container cannot contain char "/"');
         return respond(res, 500);
       }

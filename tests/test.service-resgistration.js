@@ -76,6 +76,34 @@ describe('Service registration', () => {
       });
     });
 
+    it('should register the service : string', done => {
+      fetch(url, {
+        method  : 'POST',
+        headers : {
+          'Content-Type' : 'application/json'
+        },
+        body : JSON.stringify({
+          container : '123456789',
+          key       : '/* MY PUBLIC KEY */',
+          accessKey : 'secret'
+        })
+      }).then(res => {
+        should(res.status).eql(200);
+        fs.readFile(filePath, (err, file) => {
+          should(err).not.ok();
+          should(file.toString()).eql('/* MY PUBLIC KEY */');
+
+          fs.readFile(filePathAccessKey, (err, file) => {
+            should(err).not.ok();
+            should(file.toString()).eql('secret');
+            done();
+          });
+        });
+      }).catch(e => {
+        done(e);
+      });
+    });
+
     it('should register not the service with / in container name', done => {
       let _filePath          = path.join(__dirname, 'datasets', 'service-registration', 'keys_100', '123456_89.pub');
       let _filePathAccessKey = path.join(__dirname, 'datasets', 'service-registration', 'keys_100', '123456_89.access_key');
