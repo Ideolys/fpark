@@ -119,13 +119,13 @@ function getNodesToPersistTo (str, nodes, nbReplicas = 3) {
     return [];
   }
 
+  if (nbReplicas > nodes.length) {
+    nbReplicas = nodes.length;
+  }
+
   setNodesByRegion(nodes);
   let nodesToPersist = [];
   let hashIndex      = hash(str) % nbReplicas;
-
-  if (nbReplicas > nodes.length) {
-    throw new Error('Number of replica is superior to number of nodes');
-  }
 
   _sortNodes(nodes);
 

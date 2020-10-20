@@ -82,6 +82,14 @@ describe('Repartition', () => {
       ])).be.an.Array().and.have.lengthOf(3);
     });
 
+    it('should return an array of three values even if nbReplicas is > nodes.length', () => {
+      should(repartition.getNodesToPersistTo('a', [
+          { id : 100, host : 'localhost', port : 6000 }
+        , { id : 101, host : 'localhost', port : 6001 }
+        , { id : 200, host : 'localhost', port : 6002 }
+      ], 4)).be.an.Array().and.have.lengthOf(3);
+    });
+
     it('should return three nodes among an array of nodes', () => {
       let nodes = [
           { id : 100, host : 'localhost', port : 6000 }
