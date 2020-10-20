@@ -1,6 +1,6 @@
 {
   "name": "fpark",
-  "version": "0.5.2",
+  "version": "0.5.3",
   "main": "index.js",
   "scripts": {
     "test": "mocha tests/test.*.js -w"
