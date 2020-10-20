@@ -26,11 +26,12 @@ module.exports = function nodRegister (req, res, params, store) {
         return respond(res, 400);
       }
 
+      let _filename = _body.container;
       if (typeof _body.container === 'string') {
-        _body.container = _body.container.replace('/', '_');
+        _filename = _body.container.replace('/', '_');
       }
 
-      fs.writeFile(path.join(store.CONFIG.KEYS_DIRECTORY, _body.container + '.pub'), _body.key, { flag : 'wx' }, (err) => {
+      fs.writeFile(path.join(store.CONFIG.KEYS_DIRECTORY, _filename + '.pub'), _body.key, { flag : 'wx' }, (err) => {
         if (err) {
           if (err.code === 'EEXIST') {
             return respond(res, 200);
@@ -39,12 +40,12 @@ module.exports = function nodRegister (req, res, params, store) {
           return respond(res, 500);
         }
 
-        fs.writeFile(path.join(store.CONFIG.KEYS_DIRECTORY, _body.container + '.access_key'), _body.accessKey, { flag : 'wx' }, (err) => {
+        fs.writeFile(path.join(store.CONFIG.KEYS_DIRECTORY, _filename + '.access_key'), _body.accessKey, { flag : 'wx' }, (err) => {
           if (err) {
             return respond(res, 500);
           }
 
-          setKey(_body.container, _body.key);
+          setKey(_filename, _body.key);
 
           if (getHeaderFromNode(req.headers)) {
             return respond(res, 200);
