@@ -26,6 +26,10 @@ module.exports = function nodRegister (req, res, params, store) {
         return respond(res, 400);
       }
 
+      if (typeof _body.container === 'string') {
+        _body.container = _body.container.replace('/', '_');
+      }
+
       fs.writeFile(path.join(store.CONFIG.KEYS_DIRECTORY, _body.container + '.pub'), _body.key, { flag : 'wx' }, (err) => {
         if (err) {
           if (err.code === 'EEXIST') {
