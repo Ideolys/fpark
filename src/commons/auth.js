@@ -162,8 +162,6 @@ module.exports = {
             return next();
           }
 
-          _filename = _filename.replace('_', '/');
-
           keys[_filename] = file.toString();
           next();
         });
@@ -191,8 +189,6 @@ module.exports = {
           if (err) {
             return next();
           }
-
-          _filename = _filename.replace('_', '/');
 
           accessKeys[_filename] = file.toString().trim();
           next();

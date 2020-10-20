@@ -28,7 +28,8 @@ module.exports = function nodRegister (req, res, params, store) {
 
       let _filename = _body.container;
       if (typeof _body.container === 'string') {
-        _filename = _body.container.replace('/', '_');
+        console.log('Container cannot contain char "/"');
+        return respond(res, 500);
       }
 
       fs.writeFile(path.join(store.CONFIG.KEYS_DIRECTORY, _filename + '.pub'), _body.key, { flag : 'wx' }, (err) => {

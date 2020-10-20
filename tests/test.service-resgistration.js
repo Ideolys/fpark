@@ -76,7 +76,7 @@ describe('Service registration', () => {
       });
     });
 
-    it('should register the service with / in container name', done => {
+    it('should register not the service with / in container name', done => {
       let _filePath          = path.join(__dirname, 'datasets', 'service-registration', 'keys_100', '123456_89.pub');
       let _filePathAccessKey = path.join(__dirname, 'datasets', 'service-registration', 'keys_100', '123456_89.access_key');
 
@@ -91,14 +91,12 @@ describe('Service registration', () => {
           accessKey : 'secret'
         })
       }).then(res => {
-        should(res.status).eql(200);
+        should(res.status).eql(500);
         fs.readFile(_filePath, (err, file) => {
-          should(err).not.ok();
-          should(file.toString()).eql('/* MY PUBLIC KEY */');
+          should(err).ok();
 
           fs.readFile(_filePathAccessKey, (err, file) => {
-            should(err).not.ok();
-            should(file.toString()).eql('secret');
+            should(err).ok();
             done();
           });
         });
