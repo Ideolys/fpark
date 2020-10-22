@@ -15,9 +15,19 @@ function randU32() {
 }
 
 function getMessageForReq (req) {
+
+  let url = req.url.split('/f/');
+
+  if (url.length > 1) {
+    url = url[0] + '/f/*';
+  }
+  else {
+    url = url[0];
+  }
+
   return {
+    url,
     method  : req.method,
-    url     : req.url,
     ip      : req.headers['x-forwarded-for'] || req.connection.remoteAddress || req.ip
   };
 }
