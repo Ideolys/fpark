@@ -40,7 +40,7 @@ const logger       = kittenLogger.createPersistentLogger('get_file');
  */
 function getFile (CONFIG, req, res, params, queryParams, keyNodes, streams, handler) {
   function handlerError (err) {
-    if (getHeaderNthNode(req.headers) === 3 || getHeaderFromNode(req.headers)) {
+    if (getHeaderNthNode(req.headers) === 3 || (getHeaderFromNode(req.headers) && !req.headers['x-forwarded-for'])) {
       logger.warn({ msg : 'Depth reached', from : getHeaderFromNode(req.headers) }, { idKittenLogger : req.log_id });
       return respond(res, 404);
     }
@@ -76,7 +76,8 @@ function getFile (CONFIG, req, res, params, queryParams, keyNodes, streams, hand
  */
 exports.getApi = function getApi (req, res, params, store) {
   auth.verifyAccessKey(req, res, params, queryParams => {
-    let nodes            = repartition.getNodesToPersistTo(params.id, store.CONFIG.NODES, store.CONFIG.REPLICATION_NB_REPLICAS);
+    let fileHash         = file.getFileHash(store.CONFIG, params.id);
+    let nodes            = repartition.getNodesToPersistTo(fileHash, store.CONFIG.NODES, store.CONFIG.REPLICATION_NB_REPLICAS);
     let isAllowedToWrite = repartition.isCurrentNodeInPersistentNodes(nodes, store.CONFIG.ID);
 
     if (!isAllowedToWrite && nodes.length) {

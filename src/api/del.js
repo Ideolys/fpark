@@ -28,7 +28,8 @@ const logger       = kittenLogger.createPersistentLogger('del_file');
  */
 exports.delApi = function delApi (req, res, params, store) {
   verify(req, res, params, () => {
-    let nodes            = getNodesToPersistTo(params.id, store.CONFIG.NODES, store.CONFIG.REPLICATION_NB_REPLICAS);
+    let fileHash         = file.getFileHash(store.CONFIG, params.id);
+    let nodes            = getNodesToPersistTo(fileHash, store.CONFIG.NODES, store.CONFIG.REPLICATION_NB_REPLICAS);
     let isAllowedToWrite = isCurrentNodeInPersistentNodes(nodes, store.CONFIG.ID);
 
     if (!isAllowedToWrite && nodes.length) {

@@ -106,7 +106,8 @@ exports.putFile = putFile;
  */
 exports.putApi = function put (req, res, params, store) {
   auth.verify(req, res, params, () => {
-    let nodes            = repartition.getNodesToPersistTo(params.id, store.CONFIG.NODES, store.CONFIG.REPLICATION_NB_REPLICAS);
+    let fileHash         = file.getFileHash(store.CONFIG, params.id);
+    let nodes            = repartition.getNodesToPersistTo(fileHash, store.CONFIG.NODES, store.CONFIG.REPLICATION_NB_REPLICAS);
     let isAllowedToWrite = repartition.isCurrentNodeInPersistentNodes(nodes, store.CONFIG.ID);
 
     if (!isAllowedToWrite && nodes.length) {

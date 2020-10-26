@@ -125,7 +125,7 @@ function getNodesToPersistTo (str, nodes, nbReplicas = 3) {
 
   setNodesByRegion(nodes);
   let nodesToPersist = [];
-  let hashIndex      = hash(str) % nbReplicas;
+  let hashIndex      = hash(str) % nodes.length;
 
   _sortNodes(nodes);
 

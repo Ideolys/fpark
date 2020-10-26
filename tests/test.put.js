@@ -221,20 +221,20 @@ describe('API PUT', () => {
           let headers = {};
           utils.setJWTHeader(headers, 'test', path.join(__dirname, 'datasets', '_keys', 'test.pem'));
 
-          fetch(nodes[1].host + '/c/test/f/image.jpg', {
+          fetch(nodes[0].host + '/c/test/f/image.jpg', {
             method  : 'PUT',
             body    : formData,
             headers
           }).then(res => {
             should(res.status).eql(200);
 
-            let pathDir  = path.join(__dirname, 'datasets', 'put', 'data_101', '100-101-200');
+            let pathDir  = path.join(__dirname, 'datasets', 'put', 'data_100', '100-200-201');
             let filename = utils.getFileHash('image.jpg', config.HASH_SECRET);
             fs.access(path.join(pathDir, 'test', filename + '.enc'), fs.constants.F_OK, err => {
               should(err).not.ok();
               utils.deleteFolderRecursive(pathDir);
 
-              pathDir  = path.join(__dirname, 'datasets', 'put', 'data_100', '100-101-200');
+              pathDir  = path.join(__dirname, 'datasets', 'put', 'data_200', '100-200-201');
               fs.access(path.join(pathDir, 'test', filename + '.enc'), fs.constants.F_OK, err => {
                 should(err).not.ok();
                 utils.deleteFolderRecursive(pathDir);
@@ -256,65 +256,7 @@ describe('API PUT', () => {
           let headers = {};
           utils.setJWTHeader(headers, 'test', path.join(__dirname, 'datasets', '_keys', 'test.pem'));
 
-          fetch(nodes[1].host + '/c/test/f/' + filenameOriginal + '', {
-            method  : 'PUT',
-            body    : formData,
-            headers
-          }).then(res => {
-            should(res.status).eql(200);
-
-            let pathDir  = path.join(__dirname, 'datasets', 'put', 'data_101', '100-101-200');
-            let filename = utils.getFileHash(filenameOriginal, config.HASH_SECRET);
-            let filePath = path.join(pathDir, 'test', filename + '.enc');
-            fs.access(path.join(pathDir, 'test', filename + '.enc'), fs.constants.F_OK, err => {
-              should(err).not.ok();
-
-              let filenameEncrypt  = file.getFileName(filenameOriginal, config.ENCRYPTION_IV_LENGTH);
-              let cipher           = crypto.createDecipheriv(config.ENCRYPTION_ALGORITHM, filenameEncrypt, config.ENCRYPTION_IV);
-              let fileData         = fs.readFileSync(filePath);
-              let originalFileData = fs.readFileSync(pathFile);
-
-              let decrypted = cipher.update(fileData);
-              decrypted    += cipher.final();
-
-              should(decrypted.length).lessThan(originalFileData.length);
-
-              utils.deleteFolderRecursive(pathDir);
-
-              pathDir  = path.join(__dirname, 'datasets', 'put', 'data_100', '100-101-200');
-              filePath = path.join(pathDir, 'test', filename + '.enc');
-              fs.access(path.join(pathDir, 'test', filename + '.enc'), fs.constants.F_OK, err => {
-                should(err).not.ok();
-
-                filenameEncrypt  = file.getFileName(filenameOriginal, config.ENCRYPTION_IV_LENGTH);
-                cipher           = crypto.createDecipheriv(config.ENCRYPTION_ALGORITHM, filenameEncrypt, config.ENCRYPTION_IV);
-                fileData         = fs.readFileSync(filePath);
-
-                decrypted = cipher.update(fileData);
-                decrypted += cipher.final();
-
-                should(decrypted.length).lessThan(originalFileData.length);
-
-                utils.deleteFolderRecursive(pathDir);
-                done();
-              });
-            });
-          }).catch(err => {
-            done(err);
-          });
-        });
-
-        it('should upload an image & compress : jpeg', done => {
-          let filenameOriginal = 'image.jpeg';
-          let pathFile         = path.join(__dirname, 'datasets', '_documents', filenameOriginal);
-
-          let formData = new FormData();
-          formData.append('file', fs.createReadStream(pathFile));
-
-          let headers = {};
-          utils.setJWTHeader(headers, 'test', path.join(__dirname, 'datasets', '_keys', 'test.pem'));
-
-          fetch(nodes[0].host + '/c/test/f/' + filenameOriginal +  '', {
+          fetch(nodes[0].host + '/c/test/f/' + filenameOriginal + '', {
             method  : 'PUT',
             body    : formData,
             headers
@@ -362,8 +304,8 @@ describe('API PUT', () => {
           });
         });
 
-        it('should upload an image & compress : webp', done => {
-          let filenameOriginal = 'image.webp';
+        it('should upload an image & compress : jpeg', done => {
+          let filenameOriginal = 'image.jpeg';
           let pathFile         = path.join(__dirname, 'datasets', '_documents', filenameOriginal);
 
           let formData = new FormData();
@@ -372,14 +314,14 @@ describe('API PUT', () => {
           let headers = {};
           utils.setJWTHeader(headers, 'test', path.join(__dirname, 'datasets', '_keys', 'test.pem'));
 
-          fetch(nodes[0].host + '/c/test/f/' + filenameOriginal + '', {
+          fetch(nodes[0].host + '/c/test/f/' + filenameOriginal +  '', {
             method  : 'PUT',
             body    : formData,
             headers
           }).then(res => {
             should(res.status).eql(200);
 
-            let pathDir  = path.join(__dirname, 'datasets', 'put', 'data_100', '100-101-201');
+            let pathDir  = path.join(__dirname, 'datasets', 'put', 'data_100', '100-101-200');
             let filename = utils.getFileHash(filenameOriginal, config.HASH_SECRET);
             let filePath = path.join(pathDir, 'test', filename + '.enc');
             fs.access(path.join(pathDir, 'test', filename + '.enc'), fs.constants.F_OK, err => {
@@ -397,7 +339,65 @@ describe('API PUT', () => {
 
               utils.deleteFolderRecursive(pathDir);
 
-              pathDir  = path.join(__dirname, 'datasets', 'put', 'data_101', '100-101-201');
+              pathDir  = path.join(__dirname, 'datasets', 'put', 'data_101', '100-101-200');
+              filePath = path.join(pathDir, 'test', filename + '.enc');
+              fs.access(path.join(pathDir, 'test', filename + '.enc'), fs.constants.F_OK, err => {
+                should(err).not.ok();
+
+                filenameEncrypt  = file.getFileName(filenameOriginal, config.ENCRYPTION_IV_LENGTH);
+                cipher           = crypto.createDecipheriv(config.ENCRYPTION_ALGORITHM, filenameEncrypt, config.ENCRYPTION_IV);
+                fileData         = fs.readFileSync(filePath);
+
+                decrypted = cipher.update(fileData);
+                decrypted += cipher.final();
+
+                should(decrypted.length).lessThan(originalFileData.length);
+
+                utils.deleteFolderRecursive(pathDir);
+                done();
+              });
+            });
+          }).catch(err => {
+            done(err);
+          });
+        });
+
+        it('should upload an image & compress : webp', done => {
+          let filenameOriginal = 'image.webp';
+          let pathFile         = path.join(__dirname, 'datasets', '_documents', filenameOriginal);
+
+          let formData = new FormData();
+          formData.append('file', fs.createReadStream(pathFile));
+
+          let headers = {};
+          utils.setJWTHeader(headers, 'test', path.join(__dirname, 'datasets', '_keys', 'test.pem'));
+
+          fetch(nodes[0].host + '/c/test/f/' + filenameOriginal + '', {
+            method  : 'PUT',
+            body    : formData,
+            headers
+          }).then(res => {
+            should(res.status).eql(200);
+
+            let pathDir  = path.join(__dirname, 'datasets', 'put', 'data_100', '100-200-201');
+            let filename = utils.getFileHash(filenameOriginal, config.HASH_SECRET);
+            let filePath = path.join(pathDir, 'test', filename + '.enc');
+            fs.access(path.join(pathDir, 'test', filename + '.enc'), fs.constants.F_OK, err => {
+              should(err).not.ok();
+
+              let filenameEncrypt  = file.getFileName(filenameOriginal, config.ENCRYPTION_IV_LENGTH);
+              let cipher           = crypto.createDecipheriv(config.ENCRYPTION_ALGORITHM, filenameEncrypt, config.ENCRYPTION_IV);
+              let fileData         = fs.readFileSync(filePath);
+              let originalFileData = fs.readFileSync(pathFile);
+
+              let decrypted = cipher.update(fileData);
+              decrypted    += cipher.final();
+
+              should(decrypted.length).lessThan(originalFileData.length);
+
+              utils.deleteFolderRecursive(pathDir);
+
+              pathDir  = path.join(__dirname, 'datasets', 'put', 'data_200', '100-200-201');
               filePath = path.join(pathDir, 'test', filename + '.enc');
               fs.access(path.join(pathDir, 'test', filename + '.enc'), fs.constants.F_OK, err => {
                 should(err).not.ok();
@@ -437,7 +437,7 @@ describe('API PUT', () => {
           }).then(res => {
             should(res.status).eql(200);
 
-            let pathDir  = path.join(__dirname, 'datasets', 'put', 'data_100', '100-200-201');
+            let pathDir  = path.join(__dirname, 'datasets', 'put', 'data_100', '100-101-200');
             let filename = utils.getFileHash(filenameOriginal, config.HASH_SECRET);
             let filePath = path.join(pathDir, 'test', filename + '.enc');
             fs.access(filePath, fs.constants.F_OK, err => {
@@ -452,7 +452,7 @@ describe('API PUT', () => {
 
                 utils.deleteFolderRecursive(pathDir);
 
-                pathDir  = path.join(__dirname, 'datasets', 'put', 'data_200', '100-200-201');
+                pathDir  = path.join(__dirname, 'datasets', 'put', 'data_101', '100-101-200');
                 filePath = path.join(pathDir, 'test', filename + '.enc');
                 fs.access(filePath, fs.constants.F_OK, err => {
                   should(err).not.ok();
@@ -485,14 +485,14 @@ describe('API PUT', () => {
           let headers = {};
           utils.setJWTHeader(headers, 'test', path.join(__dirname, 'datasets', '_keys', 'test.pem'));
 
-          fetch(nodes[1].host + '/c/test/f/' + filenameOriginal +  '', {
+          fetch(nodes[0].host + '/c/test/f/' + filenameOriginal +  '', {
             method  : 'PUT',
             body    : formData,
             headers
           }).then(res => {
             should(res.status).eql(200);
 
-            let pathDir  = path.join(__dirname, 'datasets', 'put', 'data_101', '100-101-200');
+            let pathDir  = path.join(__dirname, 'datasets', 'put', 'data_100', '100-200-201');
             let filename = utils.getFileHash(filenameOriginal, config.HASH_SECRET);
             let filePath = path.join(pathDir, 'test', filename + '.enc');
             fs.access(filePath, fs.constants.F_OK, err => {
@@ -507,7 +507,7 @@ describe('API PUT', () => {
 
                 utils.deleteFolderRecursive(pathDir);
 
-                pathDir  = path.join(__dirname, 'datasets', 'put', 'data_100', '100-101-200');
+                pathDir  = path.join(__dirname, 'datasets', 'put', 'data_200', '100-200-201');
                 filePath = path.join(pathDir, 'test', filename + '.enc');
                 fs.access(filePath, fs.constants.F_OK, err => {
                   should(err).not.ok();

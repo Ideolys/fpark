@@ -57,7 +57,7 @@ describe('API GET', () => {
       });
 
       it('should get a file with gzip', done => {
-        fetch(nodes[1].host + '/c/test/f/image.jpg?access_key=secret').then(res => {
+        fetch(nodes[3].host + '/c/test/f/image.jpg?access_key=secret').then(res => {
           should(res.status).eql(200);
           should(res.headers.get('content-encoding')).eql('gzip');
           done();
@@ -67,7 +67,7 @@ describe('API GET', () => {
       });
 
       it('should set cache-control header', done => {
-        fetch(nodes[1].host + '/c/test/f/image.jpg?access_key=secret').then(res => {
+        fetch(nodes[3].host + '/c/test/f/image.jpg?access_key=secret').then(res => {
           should(res.status).eql(200);
           should(res.headers.get('content-encoding')).eql('gzip');
           done();
@@ -77,7 +77,7 @@ describe('API GET', () => {
       });
 
       it('should set cache-control header', done => {
-        fetch(nodes[1].host + '/c/test/f/image.jpg?access_key=secret').then(res => {
+        fetch(nodes[3].host + '/c/test/f/image.jpg?access_key=secret').then(res => {
           should(res.status).eql(200);
           should(res.headers.get('cache-control')).be.a.String().and.eql('max-age=7776000,immutable');
           done();
@@ -87,7 +87,7 @@ describe('API GET', () => {
       });
 
       it('should get an image & resize on the fly', done => {
-        fetch(nodes[1].host + '/c/test/f/image.jpg?access_key=secret&size=S').then(res => {
+        fetch(nodes[3].host + '/c/test/f/image.jpg?access_key=secret&size=S').then(res => {
           should(res.status).eql(200);
           res.body.pipe(sharp().metadata((err, metadata) => {
               should(err).not.ok();
@@ -102,7 +102,7 @@ describe('API GET', () => {
       });
 
       it('should get an image & not resize on the fly if the size is not specified', done => {
-        fetch(nodes[1].host + '/c/test/f/image.jpg?access_key=secret&size=M').then(res => {
+        fetch(nodes[3].host + '/c/test/f/image.jpg?access_key=secret&size=M').then(res => {
           should(res.status).eql(200);
           res.body.pipe(sharp().metadata((err, metadata) => {
               should(err).not.ok();
@@ -118,11 +118,11 @@ describe('API GET', () => {
 
       describe('Inter-node communication', () => {
 
-        it('should get a file not present on current node 100 : 100; 200; [File] 101', done => {
+        it('should get a file not present on current node 100 : 100; 200; [File] 201', done => {
           fetch(nodes[0].host + '/c/test/f/image.jpg?access_key=secret').then(res => {
             should(res.status).eql(200);
 
-            let pathDir  = path.join(__dirname, 'datasets', 'get', 'data_100', '100-101-200', 'test');
+            let pathDir  = path.join(__dirname, 'datasets', 'get', 'data_100', '100-200-201', 'test');
             let filename = utils.getFileHash('image.jpg', config.HASH_SECRET);
             fs.access(path.join(pathDir, filename + '.enc'), (err) => {
               should(err).not.ok();
@@ -135,11 +135,11 @@ describe('API GET', () => {
           })
         });
 
-        it('should get a file not present on current node 200 : 100; 200; [File] 101', done => {
+        it('should get a file not present on current node 200 : 100; 200; [File] 201', done => {
           fetch(nodes[2].host + '/c/test/f/image.jpg?access_key=secret').then(res => {
             should(res.status).eql(200);
 
-            let pathDir = path.join(__dirname, 'datasets', 'get', 'data_200', '100-101-200', 'test');
+            let pathDir = path.join(__dirname, 'datasets', 'get', 'data_200', '100-200-201', 'test');
             let filename = utils.getFileHash('image.jpg', config.HASH_SECRET);
             fs.access(path.join(pathDir, filename + '.enc'), (err) => {
               should(err).not.ok();
@@ -153,10 +153,10 @@ describe('API GET', () => {
         });
 
         it('should get a file from another node and not save it to the disk (not authorized)', function (done) {
-          fetch(nodes[3].host + '/c/do-not-delete/f/a.png?access_key=secret2').then(res => {
+          fetch(nodes[1].host + '/c/do-not-delete/f/a.png?access_key=secret2').then(res => {
             should(res.status).eql(200);
 
-            let pathDir = path.join(__dirname, 'datasets', 'get', 'data_201', '100-101-200');
+            let pathDir = path.join(__dirname, 'datasets', 'get', 'data_201', '100-101-201');
             let filename = utils.getFileHash('a.png', config.HASH_SECRET);
             fs.access(path.join(pathDir, 'do-not-delete', filename + '.enc'), (err) => {
               should(err).ok();

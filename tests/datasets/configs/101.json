@@ -13,9 +13,5 @@
   "HASH_SECRET" : "test",
   "ENCRYPTION_IV"        : "srp9zyldyxdzmddx",
   "ENCRYPTION_IV_LENGTH" : 16,
-  "ENCRYPTION_ALGORITHM" : "aes-128-ctr",
-  "IMAGE_SIZE_DEFAULT_WIDTH"      : 1280,
-  "IMAGE_SIZES" : {
-    "S" : { "width" : 120, "height" : 80 }
-  }
+  "ENCRYPTION_ALGORITHM" : "aes-128-ctr"
 }

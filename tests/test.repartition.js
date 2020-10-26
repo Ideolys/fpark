@@ -188,8 +188,8 @@ describe('Repartition', () => {
       let nodesToPersit = repartition.getNodesToPersistTo('test-2.png', nodes, 2);
 
       should(nodesToPersit).eql([
-          { id : 100, host : 'localhost', port : 6000 }
-        , { id : 101, host : 'localhost', port : 6001 }
+          { id : 102, host : 'localhost', port : 6002 }
+        , { id : 103, host : 'localhost', port : 6003 }
       ]);
     });
 
@@ -204,7 +204,7 @@ describe('Repartition', () => {
       let nodesToPersit = repartition.getNodesToPersistTo('test-2.png', nodes, 1);
 
       should(nodesToPersit).eql([
-          { id : 100, host : 'localhost', port : 6000 }
+          { id : 102, host : 'localhost', port : 6002 }
       ]);
     });
 
@@ -219,8 +219,8 @@ describe('Repartition', () => {
       let nodesToPersit = repartition.getNodesToPersistTo('test-2.png', nodes, 2);
 
       should(nodesToPersit).eql([
-          { id : 100, host : 'localhost', port : 6000 }
-        , { id : 200, host : 'localhost', port : 6002 }
+          { id : 200, host : 'localhost', port : 6002 }
+        , { id : 100, host : 'localhost', port : 6000 }
       ]);
     });
 

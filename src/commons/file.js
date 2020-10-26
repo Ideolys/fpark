@@ -39,10 +39,20 @@ module.exports = {
   getFilePath (CONFIG, nodes, params) {
     let pathDisk     = path.resolve(path.join(CONFIG.FILES_DIRECTORY, nodes));
     let filename     = this.getFileName(params.id, CONFIG.ENCRYPTION_IV_LENGTH);
-    let filenameDisk = encryption.hash(params.id, CONFIG.HASH_SECRET, CONFIG.HASH_ALGORITHM);
+    let filenameDisk = this.getFileHash(CONFIG, params.id);
     let filePath     = path.join(pathDisk, params.containerId, filenameDisk + '.enc');
 
     return { path : filePath, filename };
+  },
+
+  /**
+   * Get file hash
+   * @param {Object} CONFIG
+   * @param {Object} filename
+   * @returns {String}
+   */
+  getFileHash (CONFIG, filename) {
+    return encryption.hash(filename, CONFIG.HASH_SECRET, CONFIG.HASH_ALGORITHM);
   },
 
   /**
