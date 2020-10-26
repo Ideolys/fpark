@@ -1,5 +1,8 @@
 # Changelog
 
+## v0.6.0
+**2020-XX-XX**
+
 ## v0.5.0
 **2020-09-30**
  - Rename routes:
