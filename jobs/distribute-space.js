@@ -1,7 +1,3 @@
-// @todo one file at a time (queue)
-// @todo get files that respond to old conf (XX-XX-XX where XX is the node's ID)
-// dir nodes THEN containers THEN files
-
 const path         = require('path');
 const fs           = require('fs');
 const kittenLogger = require('kitten-logger');
@@ -168,6 +164,11 @@ function _moveFiles (loggerId, config, container, files, callback) {
           id          : path.basename(file),
           containerId : container
         });
+
+        // Do nothing the file is already correctly distributed
+        if (file === filePath.path) {
+          return next();
+        }
 
         fs.rename(file, filePath.path, err => {
           if (err) {

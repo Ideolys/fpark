@@ -27,12 +27,13 @@ function loadConfig (pathConfig) {
 }
 
 function printUsage () {
-  console.log('fpark')
+  console.log('Fpark CLI')
   console.log('===============================================');
   console.group('Commands');
   console.log('start', '\t\t', 'Start the server');
-  console.log('run <job>', '\t\t', 'Run a job (distribute-space)');
-  console.log('whereis <filename>', '\t', 'Where is a file in the arborescence');
+  console.log('run <job>', '\t\t', 'Run a job among:');
+  console.log('\t\t\t', ' - distribute-space : redestribute files across nodes after changes (insert(s)/delete(s) of node(s)');
+  console.log('whereis <filename>', '\t', 'Where is a file in the arborescence ?');
   console.groupEnd('Commands');
   console.log('-----------------------------------------------');
   console.group('Options');
