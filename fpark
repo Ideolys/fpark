@@ -1,17 +1,18 @@
 #!/usr/bin/env node
-const path  = require('path');
-const fs    = require('fs');
-const fpark = require('./src');
+const path           = require('path');
+const fs             = require('fs');
+const fpark          = require('./src');
+const configVerifier = require('./src/config-verifier');
+const whereis        = require('./lib/whereis');
 
 let _config = {};
 
 let _path = process.cwd();
 
 function loadConfig (pathConfig) {
-  let _configPath = pathConfig ? path.join(process.cwd(), pathConfig) : path.join(_path, 'fpark.json');
+  let _configPath = pathConfig ? pathConfig : path.join(_path, 'fpark.json');
   if (fs.existsSync(_configPath)) {
     _config = fs.readFileSync(_configPath, 'utf8');
-
     try {
       _config = JSON.parse(_config);
     }
@@ -20,18 +21,26 @@ function loadConfig (pathConfig) {
 
     }
   }
+
+  configVerifier(_config);
 }
 
 function printUsage () {
   console.log('fpark')
   console.log('===============================================');
   console.group('Commands');
-  console.log('start', '\t', 'Start the server');
+  console.log('start', '\t\t', 'Start the server');
+  console.log('run <job>', '\t\t', 'Run a job (distribute-space)');
+  console.log('whereis <filename>', '\t', 'Where is a file in the arborescence');
   console.groupEnd('Commands');
+  console.log('-----------------------------------------------');
+  console.group('Options');
+  console.log('-c', '\t', 'Path to config');
+  console.groupEnd('Options');
 }
 
 let _args     = process.argv.slice(2);
-let _commands = ['start'];
+let _commands = ['start', 'run', 'whereis'];
 
 if (_commands.indexOf(_args[0]) === -1) {
   return printUsage();
@@ -45,8 +54,35 @@ for (let i = 0; i < _args.length; i++) {
       _argValues['c'] = _args[i + 1] || null;
       i++;
       break;
+    default:
+      _argValues['param'] = _args[i];
+      break;
   }
 }
 
 loadConfig(_argValues['c']);
-fpark.start(_config);
+
+switch (_args[0]) {
+  case 'start':
+    fpark.start(_config);
+    break;
+  case 'run':
+    if (['distribute-space'].indexOf(_argValues['param']) === -1) {
+      return printUsage();
+    }
+    runJob(_argValues['param']);
+    break;
+  case 'whereis':
+    whereis(_config, _argValues['param']);
+    break;
+}
+
+
+function runJob (job) {
+  const m = require(path.join(__dirname, 'jobs', job + '.js'));
+  if (!m) {
+    return printUsage();
+  }
+
+  m({ config : _config }, process.exit);
+}
