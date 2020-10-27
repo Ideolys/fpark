@@ -4,6 +4,7 @@ const fs             = require('fs');
 const fpark          = require('./src');
 const configVerifier = require('./src/config-verifier');
 const whereis        = require('./lib/whereis');
+const kittenLogger   = require('kitten-logger');
 
 let _config = {};
 
@@ -62,6 +63,10 @@ for (let i = 0; i < _args.length; i++) {
 
 loadConfig(_argValues['c']);
 
+if (Object.keys(_config).length === 0) {
+  return console.error('No config found, you should provide a config with option "-c" as "-c /path/to/config.json"');
+}
+
 switch (_args[0]) {
   case 'start':
     fpark.start(_config);
@@ -83,6 +88,11 @@ function runJob (job) {
   if (!m) {
     return printUsage();
   }
+
+  // init kitten logger
+  process.env.KITTEN_LOGGER_RETENTION_DIRECTORY = _config.LOGS_DIRECTORY;
+  process.env.KITTEN_LOGGER_RETENTION_FILENAME  = 'jobs';
+  kittenLogger.init();
 
   m({ config : _config }, process.exit);
 }

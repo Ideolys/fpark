@@ -58,10 +58,8 @@ function _start (callback) {
  * @param {Function} callback
  */
 function _end (loggerId, callback) {
-  fs.unlink(pidFile, () => {
-    logger.info('Job has ended', { kittenLogger : loggerId });
-    callback();
-  });
+  logger.info('Job has ended', { idKittenLogger : loggerId });
+  callback();
 }
 
 /**
@@ -71,11 +69,19 @@ function _end (loggerId, callback) {
 function _isJobRunning (callback) {
   fs.stat(pidFile, fs.constants.F_OK, (err) => {
     if (err) {
-      callback(false);
+      return callback(false);
     }
 
     callback(true);
   })
+}
+
+/**
+ * Remove job file
+ * @param {Function} callback
+ */
+function _removeJobFile (callback) {
+  fs.unlink(pidFile, callback);
 }
 
 /**
@@ -94,9 +100,10 @@ function _walkDirectory (dir, onLastDirectoryFn, done) {
 
     var i = 0;
     function next () {
-      let _file = list[i++];
+      let _file      = list[i++];
+      let _container = _file;
       if (!_file) {
-        return done(null, _results);
+        return done(null, results);
       }
 
       _file = dir + '/' + _file;
@@ -104,14 +111,14 @@ function _walkDirectory (dir, onLastDirectoryFn, done) {
         if (stat && stat.isDirectory()) {
           return _walkDirectory(_file, onLastDirectoryFn, (err, res) => {
             if (!res.length) {
-              next();
+              return next();
             }
 
-            onLastDirectoryFn(_file, list[i], res, next);
+            onLastDirectoryFn(_file, _container, res, next);
           });
         }
 
-        if (_file.substring(_file.length - 3, _file.length) === '.enc') {
+        if (_file.substring(_file.length - 4, _file.length) === '.enc') {
           results.push(_file);
         }
 
@@ -202,21 +209,23 @@ function distributeSpace (params, callback) {
 
   _isJobRunning(isRunning => {
     if (isRunning) {
-      logger.warning('Job is already running', { idKittenLogger : loggerId });
+      logger.warn('Job is already running', { idKittenLogger : loggerId });
       return _end(loggerId, callback);
     }
 
     _start(() => {
       _walkDirectory(config.FILES_DIRECTORY, (pathContainer, container, files, next) => {
         _moveFiles(loggerId, config, container, files, nbErrors => {
-          logger.error(
-            'Job has distributed ' + (nbErrors - files.length) + '/' + files.length + ' for dir ' + pathContainer,
+          logger.info(
+            'Job has distributed ' + Math.abs(nbErrors - files.length) + '/' + files.length + ' for dir ' + pathContainer,
             { idKittenLogger : loggerId }
           );
           next();
         });
       }, () => {
-        _end(loggerId, callback);
+        _removeJobFile(() => {
+          _end(loggerId, callback);
+        });
       });
     });
   });

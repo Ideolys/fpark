@@ -1,0 +1,22 @@
+{
+  "ID"              : 100,
+  "SERVER_PORT"     : 6000,
+  "SERVER_CLUSTERS" : 1,
+  "NODES"           : [
+      { "id" : 100, "host" : "http://localhost:6000" }
+    , { "id" : 101, "host" : "http://localhost:6001" }
+    , { "id" : 200, "host" : "http://localhost:7000" }
+    , { "id" : 201, "host" : "http://localhost:7001" }
+  ],
+  "OLD_NODES": [
+      { "id" : 100, "host" : "http://localhost:6000" }
+    , { "id" : 101, "host" : "http://localhost:6001" }
+    , { "id" : 200, "host" : "http://localhost:7000" }
+  ],
+  "FILES_DIRECTORY": "data",
+  "KEYS_DIRECTORY" : "keys_100",
+  "HASH_SECRET" : "test",
+  "ENCRYPTION_IV"        : "srp9zyldyxdzmddx",
+  "ENCRYPTION_IV_LENGTH" : 16,
+  "ENCRYPTION_ALGORITHM" : "aes-128-ctr"
+}
