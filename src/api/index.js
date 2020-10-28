@@ -14,7 +14,7 @@ function load (router, store) {
   router.on('DELETE', '/c/:containerId/f/:id', delApi, store);
 
   if (store.CONFIG.IS_REGISTRATION_ENABLED) {
-    router.on('POST', '/node/register', nodeApi.nodRegister, store);
+    router.on('POST', '/node/register', nodeApi.nodeRegister, store);
   }
 
   router.on('GET', '/node/stats', nodeApi.nodeStats, store);

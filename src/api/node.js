@@ -7,7 +7,7 @@ const { respond, queue }                          = require('../commons/utils');
 const { setKey }                                  = require('../commons/auth');
 const { setHeaderCurrentNode, getHeaderFromNode } = require('../commons/headers');
 
-function nodRegister (req, res, params, store) {
+function nodeRegister (req, res, params, store) {
   if (req.headers['content-type'] !== 'application/json') {
     return respond(res, 400);
   }
@@ -146,6 +146,6 @@ function _formatStatsForJSON (res, statistics) {
 }
 
 module.exports = {
-  nodRegister,
+  nodeRegister,
   nodeStats
 };
