@@ -1,11 +1,13 @@
 const fs                                          = require('fs');
 const path                                        = require('path');
+const url                                         = require('url');
 const fetch                                       = require('node-fetch');
+const stats                                       = require('../stats');
 const { respond, queue }                          = require('../commons/utils');
 const { setKey }                                  = require('../commons/auth');
 const { setHeaderCurrentNode, getHeaderFromNode } = require('../commons/headers');
 
-module.exports = function nodRegister (req, res, params, store) {
+function nodRegister (req, res, params, store) {
   if (req.headers['content-type'] !== 'application/json') {
     return respond(res, 400);
   }
@@ -89,3 +91,61 @@ module.exports = function nodRegister (req, res, params, store) {
     }
   });
 }
+
+function nodeStats (req, res, params, store) {
+  stats.getAll(statistics => {
+    if (!statistics) {
+      return _formatStatsForJSON(res, statistics);
+    }
+
+    let query       = url.parse(req.url).search;
+    let queryParams = new URLSearchParams(query);
+    let format      = queryParams.get('format');
+
+    if (format === 'promotheus') {
+      return _formatStatsForPromotheus(res, statistics);
+    }
+
+
+    _formatStatsForJSON(res, statistics);
+  });
+}
+
+/**
+ * Format statistics for promotheus
+ * @param {Object} res
+ * @param {Array} statistics [{ label : String, description : Object, value : * }]
+ */
+function _formatStatsForPromotheus (res, statistics) {
+  let result = '';
+
+  for (let i = 0; i < statistics.length; i++) {
+    let description = [];
+
+    for (let key in statistics[i].description) {
+      description.push(key + '="' + statistics[i].description[key] + '"');
+    }
+
+    result += statistics[i].label + '{' + description.join(',') + '} ' + statistics[i].value + '\n';
+  }
+
+  res.setHeader('Content-type', 'text/plain');
+  res.write(result);
+  respond(res, 200);
+}
+
+/**
+ * Format statistics for JSON
+ * @param {Object} res
+ * @param {Array} statistics [{ label : String, description : Object, value : * }]
+ */
+function _formatStatsForJSON (res, statistics) {
+  res.setHeader('Content-type', 'application/json');
+  res.write(JSON.stringify(statistics));
+  respond(res, 200);
+}
+
+module.exports = {
+  nodRegister,
+  nodeStats
+};

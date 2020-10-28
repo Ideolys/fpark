@@ -31,6 +31,7 @@ const auth = require('../commons/auth');
 
 const kittenLogger = require('kitten-logger');
 const logger       = kittenLogger.createPersistentLogger('put_file');
+const stats        = require('../stats');
 
 /**
  * PUT a file
@@ -105,6 +106,12 @@ exports.putFile = putFile;
  * @param {Object} store { CONFIG }
  */
 exports.putApi = function put (req, res, params, store) {
+  req.counters = [
+    stats.COUNTER_NAMESPACES.REQUEST_DURATION_AVG_PUT,
+    stats.COUNTER_NAMESPACES.REQUEST_DURATION_PUT,
+    stats.COUNTER_NAMESPACES.REQUEST_NUMBER_PUT,
+  ];
+
   auth.verify(req, res, params, () => {
     let fileHash         = file.getFileHash(store.CONFIG, params.id);
     let nodes            = repartition.getNodesToPersistTo(fileHash, store.CONFIG.NODES, store.CONFIG.REPLICATION_NB_REPLICAS);
@@ -140,6 +147,8 @@ exports.putApi = function put (req, res, params, store) {
         respond(res, 500);
       });
     }
+
+    req.counters.push(stats.COUNTER_NAMESPACES.FILES_COUNT);
 
     let keyNodes = repartition.flattenNodes(nodes);
 
