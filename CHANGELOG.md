@@ -2,6 +2,7 @@
 
 ## v0.6.0
 **2020-XX-XX**
+  - Add route `GET /node/stats` to retrieve useful usage statistics (ie README).
   - **Breaking changes**:
     - File repartition has changed. Previously, repartition started from the filename modulo the number of replicas. Now, repartition starts from the hash of the filename modulo the number of nodes.
 
