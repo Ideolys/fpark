@@ -102,8 +102,8 @@ function nodeStats (req, res, params, store) {
     let queryParams = new URLSearchParams(query);
     let format      = queryParams.get('format');
 
-    if (format === 'promotheus') {
-      return _formatStatsForPromotheus(res, statistics);
+    if (format === 'prometheus') {
+      return _formatStatsForPrometheus(res, statistics);
     }
 
 
@@ -112,11 +112,11 @@ function nodeStats (req, res, params, store) {
 }
 
 /**
- * Format statistics for promotheus
+ * Format statistics for prometheus
  * @param {Object} res
  * @param {Array} statistics [{ label : String, description : Object, value : * }]
  */
-function _formatStatsForPromotheus (res, statistics) {
+function _formatStatsForPrometheus (res, statistics) {
   let result = '';
 
   for (let i = 0; i < statistics.length; i++) {
