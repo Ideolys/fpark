@@ -179,18 +179,17 @@ function isCurrentNodeInPersistentNodes (nodes, nodeId) {
 /**
  * Flatten nodes
  * @param {Array} nodes
+ * @param {String} currentNode @optional
  * @returns {String} "node1Id-node2Id-node3Id"
  */
-function flattenNodes (nodes) {
+function flattenNodes (nodes, currentNode) {
   _sortNodes(nodes);
 
-  let res = '';
-
-  for (let i = 0; i< nodes.length; i++) {
-    res += '-' + nodes[i].id;
+  if (currentNode && nodes.length === 1 && currentNode === nodes[0].id) {
+    return '';
   }
 
-  return res.slice(1);
+  return nodes.map(n => n.id).join('-');
 }
 
 module.exports = {

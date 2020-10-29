@@ -141,7 +141,7 @@ exports.putApi = function put (req, res, params, store) {
       });
     }
 
-    let keyNodes = repartition.flattenNodes(nodes);
+    let keyNodes = repartition.flattenNodes(nodes, store.CONFIG.ID);
 
     let busboy = null;
     try {
@@ -213,10 +213,13 @@ exports.putApi = function put (req, res, params, store) {
         setHeaderCurrentNode(headers, store.CONFIG.ID);
         setHeaderReplication(headers, store.CONFIG.ID)
 
+        let nbNodes = 0;
         queue(nodes, (node, next) => {
           if (node.id === store.CONFIG.ID) {
             return next();
           }
+
+          nbNodes++;
 
           let form    = new FormData();
           let streams = file.getFilePath(store.CONFIG, keyNodes, params).path;
@@ -241,7 +244,7 @@ exports.putApi = function put (req, res, params, store) {
           })
         }, () => {
           isWritePending = false;
-          done(res, nodes.length ? 500 : 200);
+          done(res, nbNodes ? 500 : 200);
         });
       });
     });
