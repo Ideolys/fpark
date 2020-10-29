@@ -160,17 +160,14 @@ function _moveFiles (loggerId, config, container, files, callback) {
           return next();
         }
 
-        let filePath =  filer.getFilePath(config, keyNodes, {
-          id          : path.basename(file),
-          containerId : container
-        });
+        let filePath = path.join(pathDisk, container, fileHash + '.enc');
 
         // Do nothing the file is already correctly distributed
-        if (file === filePath.path) {
+        if (file === filePath) {
           return next();
         }
 
-        fs.rename(file, filePath.path, err => {
+        fs.rename(file, filePath, err => {
           if (err) {
             logger.error('Cannot distribute file ' + file + ': ' + err.message, { idKittenLogger : loggerId });
             nbErrors++;
