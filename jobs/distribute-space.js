@@ -140,7 +140,7 @@ function _moveFiles (loggerId, config, container, files, callback) {
   queue(files, (file, next) => {
     let fileHash = path.basename(file, '.enc');
     let nodes    = repartition.getNodesToPersistTo(fileHash, config.NODES, config.REPLICATION_NB_REPLICAS);
-    let keyNodes = repartition.flattenNodes(nodes);
+    let keyNodes = repartition.flattenNodes(nodes, config.ID);
     let pathDisk = path.join(config.FILES_DIRECTORY, keyNodes);
 
     createDirIfNotExists(pathDisk, err => {
