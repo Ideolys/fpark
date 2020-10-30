@@ -3,7 +3,6 @@ const fs           = require('fs');
 const kittenLogger = require('kitten-logger');
 
 const repartition = require('../src/commons/repartition');
-const filer       = require('../src/commons/file');
 
 const logger  = kittenLogger.createPersistentLogger('fpark:job:distribute-space');
 const pidFile = path.join(process.cwd(), 'job_distribute_space.pid');
@@ -132,9 +131,10 @@ function _walkDirectory (dir, onLastDirectoryFn, done) {
  * @param {Object} config
  * @param {String} container
  * @param {Array} files
+ * @param {Set} setRSyncCommands
  * @param {Function} callback
  */
-function _moveFiles (loggerId, config, container, files, callback) {
+function _moveFiles (loggerId, config, container, files, setRSyncCommands, callback) {
   let nbErrors = 0;
 
   queue(files, (file, next) => {
@@ -142,6 +142,13 @@ function _moveFiles (loggerId, config, container, files, callback) {
     let nodes    = repartition.getNodesToPersistTo(fileHash, config.NODES, config.REPLICATION_NB_REPLICAS);
     let keyNodes = repartition.flattenNodes(nodes, config.ID);
     let pathDisk = path.join(config.FILES_DIRECTORY, keyNodes);
+
+    let isAllowedToWrite = repartition.isCurrentNodeInPersistentNodes(nodes, config.ID);
+    if (!isAllowedToWrite && nodes.length) {
+      nodes.forEach(node => {
+        setRSyncCommands.add(`rsync -rz --remove-sent-files ${ pathDisk } ubuntu@${ new URL(node.host).hostname }:${ pathDisk }`);
+      });
+    }
 
     createDirIfNotExists(pathDisk, err => {
       if (err) {
@@ -211,9 +218,11 @@ function distributeSpace (params, callback) {
       return _end(loggerId, callback);
     }
 
+    const setRSyncCommands = new Set();
+
     _start(() => {
       _walkDirectory(config.FILES_DIRECTORY, (pathContainer, container, files, next) => {
-        _moveFiles(loggerId, config, container, files, nbErrors => {
+        _moveFiles(loggerId, config, container, files, setRSyncCommands, nbErrors => {
           logger.info(
             'Job has distributed ' + Math.abs(nbErrors - files.length) + '/' + files.length + ' for dir ' + pathContainer,
             { idKittenLogger : loggerId }
@@ -222,6 +231,15 @@ function distributeSpace (params, callback) {
         });
       }, () => {
         _removeJobFile(() => {
+
+          logger.info('RSYNC commands to launch to end data distribution:');
+          if (!setRSyncCommands.size) {
+            logger.info('No commands');
+          }
+          setRSyncCommands.forEach(command => {
+            logger.info(command);
+          });
+
           _end(loggerId, callback);
         });
       });
