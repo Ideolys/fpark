@@ -28,6 +28,7 @@ File server with batteries included :
       - [PUT /c/:container/f/:filename](#put-ccontainerffilename)
       - [DELETE /c/:container/f/:filename](#delete-ccontainerffilename)
       - [POST /node/register](#post-noderegister)
+      - [GET /node/stats](#get-nodestats)
     - [Token](#token)
   - [Multi-instances](#multi-instances)
     - [Region](#region)
@@ -145,6 +146,20 @@ The body must be a valid JSON object with :
 ```
 
 The url can be disabled with `IS_REGISTRATION_ENABLED`.
+
+#### GET /node/stats
+
+Get Fpark statistics.
+
+Statistic                                             | Description
+------------------------------------------------------|------------
+`fpark_info_uptime`                                   | Number of seconds the process is running
+`fpark_requests_duration_milliseconds_persec_average` | Average of request durations in milliseconds per second
+`fpark_requests_duration_seconds_total`               | Sum of request durations in seconds
+`fpark_requests_total`                                | Sum of number of requests
+`fpark_files_count_total`                             | Count of reads & writes of files
+
+Query option for the url is `format` wihch accepts the following values: `json`, `prometheus`.
 
 ### Token
 
