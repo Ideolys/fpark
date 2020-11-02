@@ -16,8 +16,9 @@ function load (router, store) {
   if (store.CONFIG.IS_REGISTRATION_ENABLED) {
     router.on('POST', '/node/register', nodeApi.nodeRegister, store);
   }
-
-  router.on('GET', '/node/stats', nodeApi.nodeStats, store);
+  if (store.CONFIG.IS_STATS_ENABLED) {
+    router.on('GET', '/node/stats', nodeApi.nodeStats, store);
+  }
 }
 
 module.exports = load;
