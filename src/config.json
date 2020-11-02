@@ -6,6 +6,7 @@
   "FILES_DIRECTORY"         : "data",
   "KEYS_DIRECTORY"          : "keys",
   "IS_REGISTRATION_ENABLED" : true,
+  "IS_STATS_ENABLED"        : true,
 
   "ENCRYPTION_IV"        : "srp9zyldyxdzmddx",
   "ENCRYPTION_IV_LENGTH" : 16,

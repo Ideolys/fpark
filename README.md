@@ -84,7 +84,8 @@ vi config.json
   "LOGS_DIRECTORY"          : "logs", // Relative path to logs
   "FILES_DIRECTORY"          : "data", // Relative path to data (ie files)
   "KEYS_DIRECTORY"          : "keys", // Relative path to where public keys are stored for PUT/DEL authorizations
-  "IS_REGISTRATION_ENABLED" : false,  // Activate or Desactive container registration
+  "IS_REGISTRATION_ENABLED" : true,  // Activate or Desactive container registration
+  "IS_STATS_ENABLED"        : true,  // Activate or Desactive service statistics
 
   "ENCRYPTION_IV"        : "srp9zyldyxdzmddx", // Secret for encryption
   "ENCRYPTION_IV_LENGTH" : 16,                 // String for encryption key length
