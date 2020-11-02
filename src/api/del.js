@@ -70,7 +70,7 @@ exports.delApi = function delApi (req, res, params, store) {
       });
     }
 
-    let keyNodes = flattenNodes(nodes);
+    let keyNodes = flattenNodes(nodes, store.CONFIG.ID);
     let filePath = file.getFilePath(store.CONFIG, keyNodes, params);
     fs.unlink(filePath.path, err => {
       if (err) {

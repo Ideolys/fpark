@@ -319,5 +319,24 @@ describe('Repartition', () => {
       ])).eql('100-101-200');
     });
 
+    it('should return empty string and current node is the only node', () => {
+      should(repartition.flattenNodes([
+        { id : 200, host : 'localhost', port : 6002 }
+      ], 200)).eql('');
+    });
+
+    it('should not return empty string and current node is the only node', () => {
+      should(repartition.flattenNodes([
+          { id : 200, host : 'localhost', port : 6002 }
+        , { id : 201, host : 'localhost', port : 6003 }
+      ], 200)).eql('200-201');
+    });
+
+    it('should return the only node if no current node set', () => {
+      should(repartition.flattenNodes([
+        { id : 200, host : 'localhost', port : 6002 }
+      ])).eql('200');
+    });
+
   });
 });

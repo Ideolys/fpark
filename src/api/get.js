@@ -119,7 +119,7 @@ exports.getApi = function getApi (req, res, params, store) {
 
     req.counters.push(stats.COUNTER_NAMESPACES.FILES_COUNT);
 
-    let keyNodes = repartition.flattenNodes(nodes);
+    let keyNodes = repartition.flattenNodes(nodes, store.CONFIG.ID);
 
     res.setHeader('Cache-Control', 'max-age=' + store.CONFIG.CACHE_CONTROL_MAX_AGE + ',immutable');
     res.setHeader('Content-Encoding', 'gzip');

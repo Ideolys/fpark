@@ -28,5 +28,8 @@
   "directories": {
     "test": "tests"
   },
-  "description": ""
+  "description": "",
+  "pkg": {
+    "scripts": ["jobs/*.js"]
+  }
 }
