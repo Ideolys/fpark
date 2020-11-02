@@ -1,10 +1,13 @@
 # Documentation
 
-+ [Configuration](./configuration.md)
+## API
 
 + [API](./api.md)
-+ [Tolen](./token.md)
-+ [File encryption](./file-encryption.md)
++ [Token](./token.md)
 
+## Service
+
++ [Configuration](./configuration.md)
 + [Cluster](./cluster.md)
++ [File encryption](./file-encryption.md)
 + [Update (cluster) space](./update-space.md)
