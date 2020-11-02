@@ -83,7 +83,10 @@ switch (_args[0]) {
     break;
 }
 
-
+/**
+ * Run a job
+ * @param {String} job
+ */
 function runJob (job) {
   const m = require(path.join(__dirname, 'jobs', job + '.js'));
   if (!m) {
