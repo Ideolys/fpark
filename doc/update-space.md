@@ -23,8 +23,8 @@ Old configuration:
 ```json
 {
   "NODES" : [
-    { "id" : 100, localhost : "http://localhost:3000" },
-    { "id" : 200, localhost : "http://localhost:4000" }
+    { "id" : 100, "host" : "http://localhost:3000" },
+    { "id" : 200, "host" : "http://localhost:4000" }
   ]
 }
 ```
@@ -34,14 +34,14 @@ New configuration (we add two nodes 101 and 201):
 ```json
 {
   "NODES" : [
-    { "id" : 100, localhost : "http://localhost:3000" },
-    { "id" : 101, localhost : "http://localhost:3001" },
-    { "id" : 200, localhost : "http://localhost:4000" },
-    { "id" : 201, localhost : "http://localhost:4001" }
+    { "id" : 100, "host" : "http://localhost:3000" },
+    { "id" : 101, "host" : "http://localhost:3001" },
+    { "id" : 200, "host" : "http://localhost:4000" },
+    { "id" : 201, "host" : "http://localhost:4001" }
   ],
   "OLD_NODES" : [
-    { "id" : 100, localhost : "http://localhost:3000" },
-    { "id" : 200, localhost : "http://localhost:4000" }
+    { "id" : 100, "host" : "http://localhost:3000" },
+    { "id" : 200, "host" : "http://localhost:4000" }
   ]
 }
 ```
