@@ -1,5 +1,6 @@
 const crypto       = require('crypto');
 const kittenLogger = require('kitten-logger');
+const stats        = require('./stats');
 
 kittenLogger.addFormatter('http:start', kittenLogger.formattersCollection.http_start);
 kittenLogger.addFormatter('http:end'  , kittenLogger.formattersCollection.http_end);
@@ -33,10 +34,22 @@ function getMessageForReq (req) {
 }
 
 function getMessageForRes (req, res) {
-  return {
+  let result = {
     time   : process.hrtime(req.log_start)[1] / 1000000, //ms
     status : res.statusCode
+  };
+
+  if (req.counters) {
+    req.counters.forEach(counter => {
+      stats.update({
+        counterId    : counter,
+        subCounterId : result.status,
+        value        : result.time
+      });
+    });
   }
+
+  return result;
 }
 
 /**

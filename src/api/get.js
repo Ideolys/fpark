@@ -26,6 +26,7 @@ const isImage = require('../commons/image/utils').isImage;
 const kittenLogger = require('kitten-logger');
 const auth         = require('../commons/auth');
 const logger       = kittenLogger.createPersistentLogger('get_file');
+const stats        = require('../stats');
 
 /**
  * Get a file (initialize streams)
@@ -40,7 +41,7 @@ const logger       = kittenLogger.createPersistentLogger('get_file');
  */
 function getFile (CONFIG, req, res, params, queryParams, keyNodes, streams, handler) {
   function handlerError (err) {
-    if (getHeaderNthNode(req.headers) === 3 || getHeaderFromNode(req.headers)) {
+    if (getHeaderNthNode(req.headers) === 3 || (getHeaderFromNode(req.headers) && !req.headers['x-forwarded-for'])) {
       logger.warn({ msg : 'Depth reached', from : getHeaderFromNode(req.headers) }, { idKittenLogger : req.log_id });
       return respond(res, 404);
     }
@@ -75,8 +76,15 @@ function getFile (CONFIG, req, res, params, queryParams, keyNodes, streams, hand
  * @param {Object} store
  */
 exports.getApi = function getApi (req, res, params, store) {
+  req.counters = [
+    stats.COUNTER_NAMESPACES.REQUEST_DURATION_AVG_GET,
+    stats.COUNTER_NAMESPACES.REQUEST_DURATION_GET,
+    stats.COUNTER_NAMESPACES.REQUEST_NUMBER_GET
+  ];
+
   auth.verifyAccessKey(req, res, params, queryParams => {
-    let nodes            = repartition.getNodesToPersistTo(params.id, store.CONFIG.NODES, store.CONFIG.REPLICATION_NB_REPLICAS);
+    let fileHash         = file.getFileHash(store.CONFIG, params.id);
+    let nodes            = repartition.getNodesToPersistTo(fileHash, store.CONFIG.NODES, store.CONFIG.REPLICATION_NB_REPLICAS);
     let isAllowedToWrite = repartition.isCurrentNodeInPersistentNodes(nodes, store.CONFIG.ID);
 
     if (!isAllowedToWrite && nodes.length) {
@@ -109,7 +117,9 @@ exports.getApi = function getApi (req, res, params, store) {
       });
     }
 
-    let keyNodes = repartition.flattenNodes(nodes);
+    req.counters.push(stats.COUNTER_NAMESPACES.FILES_COUNT);
+
+    let keyNodes = repartition.flattenNodes(nodes, store.CONFIG.ID);
 
     res.setHeader('Cache-Control', 'max-age=' + store.CONFIG.CACHE_CONTROL_MAX_AGE + ',immutable');
     res.setHeader('Content-Encoding', 'gzip');

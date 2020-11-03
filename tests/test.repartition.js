@@ -188,8 +188,8 @@ describe('Repartition', () => {
       let nodesToPersit = repartition.getNodesToPersistTo('test-2.png', nodes, 2);
 
       should(nodesToPersit).eql([
-          { id : 100, host : 'localhost', port : 6000 }
-        , { id : 101, host : 'localhost', port : 6001 }
+          { id : 102, host : 'localhost', port : 6002 }
+        , { id : 103, host : 'localhost', port : 6003 }
       ]);
     });
 
@@ -204,7 +204,7 @@ describe('Repartition', () => {
       let nodesToPersit = repartition.getNodesToPersistTo('test-2.png', nodes, 1);
 
       should(nodesToPersit).eql([
-          { id : 100, host : 'localhost', port : 6000 }
+          { id : 102, host : 'localhost', port : 6002 }
       ]);
     });
 
@@ -219,8 +219,8 @@ describe('Repartition', () => {
       let nodesToPersit = repartition.getNodesToPersistTo('test-2.png', nodes, 2);
 
       should(nodesToPersit).eql([
-          { id : 100, host : 'localhost', port : 6000 }
-        , { id : 200, host : 'localhost', port : 6002 }
+          { id : 200, host : 'localhost', port : 6002 }
+        , { id : 100, host : 'localhost', port : 6000 }
       ]);
     });
 
@@ -317,6 +317,25 @@ describe('Repartition', () => {
       , { id : 100, host : 'localhost', port : 6000 }
       , { id : 101, host : 'localhost', port : 6001 }
       ])).eql('100-101-200');
+    });
+
+    it('should return empty string and current node is the only node', () => {
+      should(repartition.flattenNodes([
+        { id : 200, host : 'localhost', port : 6002 }
+      ], 200)).eql('');
+    });
+
+    it('should not return empty string and current node is the only node', () => {
+      should(repartition.flattenNodes([
+          { id : 200, host : 'localhost', port : 6002 }
+        , { id : 201, host : 'localhost', port : 6003 }
+      ], 200)).eql('200-201');
+    });
+
+    it('should return the only node if no current node set', () => {
+      should(repartition.flattenNodes([
+        { id : 200, host : 'localhost', port : 6002 }
+      ])).eql('200');
     });
 
   });

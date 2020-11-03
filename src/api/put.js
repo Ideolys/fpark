@@ -31,6 +31,7 @@ const auth = require('../commons/auth');
 
 const kittenLogger = require('kitten-logger');
 const logger       = kittenLogger.createPersistentLogger('put_file');
+const stats        = require('../stats');
 
 /**
  * PUT a file
@@ -105,8 +106,15 @@ exports.putFile = putFile;
  * @param {Object} store { CONFIG }
  */
 exports.putApi = function put (req, res, params, store) {
+  req.counters = [
+    stats.COUNTER_NAMESPACES.REQUEST_DURATION_AVG_PUT,
+    stats.COUNTER_NAMESPACES.REQUEST_DURATION_PUT,
+    stats.COUNTER_NAMESPACES.REQUEST_NUMBER_PUT,
+  ];
+
   auth.verify(req, res, params, () => {
-    let nodes            = repartition.getNodesToPersistTo(params.id, store.CONFIG.NODES, store.CONFIG.REPLICATION_NB_REPLICAS);
+    let fileHash         = file.getFileHash(store.CONFIG, params.id);
+    let nodes            = repartition.getNodesToPersistTo(fileHash, store.CONFIG.NODES, store.CONFIG.REPLICATION_NB_REPLICAS);
     let isAllowedToWrite = repartition.isCurrentNodeInPersistentNodes(nodes, store.CONFIG.ID);
 
     if (!isAllowedToWrite && nodes.length) {
@@ -140,7 +148,9 @@ exports.putApi = function put (req, res, params, store) {
       });
     }
 
-    let keyNodes = repartition.flattenNodes(nodes);
+    req.counters.push(stats.COUNTER_NAMESPACES.FILES_COUNT);
+
+    let keyNodes = repartition.flattenNodes(nodes, store.CONFIG.ID);
 
     let busboy = null;
     try {
@@ -212,10 +222,13 @@ exports.putApi = function put (req, res, params, store) {
         setHeaderCurrentNode(headers, store.CONFIG.ID);
         setHeaderReplication(headers, store.CONFIG.ID)
 
+        let nbNodes = 0;
         queue(nodes, (node, next) => {
           if (node.id === store.CONFIG.ID) {
             return next();
           }
+
+          nbNodes++;
 
           let form    = new FormData();
           let streams = file.getFilePath(store.CONFIG, keyNodes, params).path;
@@ -240,7 +253,7 @@ exports.putApi = function put (req, res, params, store) {
           })
         }, () => {
           isWritePending = false;
-          done(res, nodes.length ? 500 : 200);
+          done(res, nbNodes ? 500 : 200);
         });
       });
     });

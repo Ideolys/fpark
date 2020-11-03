@@ -18,6 +18,7 @@ const { verify }         = require('../commons/auth');
 
 const kittenLogger = require('kitten-logger');
 const logger       = kittenLogger.createPersistentLogger('del_file');
+const stats        = require('../stats');
 
 /**
  * DEL API
@@ -27,8 +28,15 @@ const logger       = kittenLogger.createPersistentLogger('del_file');
  * @param {Object} store { CONFIG }
  */
 exports.delApi = function delApi (req, res, params, store) {
+  req.counters = [
+    stats.COUNTER_NAMESPACES.REQUEST_DURATION_AVG_DEL,
+    stats.COUNTER_NAMESPACES.REQUEST_DURATION_DEL,
+    stats.COUNTER_NAMESPACES.REQUEST_NUMBER_DEL
+  ];
+
   verify(req, res, params, () => {
-    let nodes            = getNodesToPersistTo(params.id, store.CONFIG.NODES, store.CONFIG.REPLICATION_NB_REPLICAS);
+    let fileHash         = file.getFileHash(store.CONFIG, params.id);
+    let nodes            = getNodesToPersistTo(fileHash, store.CONFIG.NODES, store.CONFIG.REPLICATION_NB_REPLICAS);
     let isAllowedToWrite = isCurrentNodeInPersistentNodes(nodes, store.CONFIG.ID);
 
     if (!isAllowedToWrite && nodes.length) {
@@ -62,7 +70,7 @@ exports.delApi = function delApi (req, res, params, store) {
       });
     }
 
-    let keyNodes = flattenNodes(nodes);
+    let keyNodes = flattenNodes(nodes, store.CONFIG.ID);
     let filePath = file.getFilePath(store.CONFIG, keyNodes, params);
     fs.unlink(filePath.path, err => {
       if (err) {

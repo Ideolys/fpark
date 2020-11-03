@@ -2,7 +2,7 @@
   "ID"              : 1,
   "SERVER_PORT"     : 6000,
   "SERVER_CLUSTERS" : 1,
-  "NODES"           : [{"id":1, "host": "http://localhost:6000"}],
+  "NODES"           : [],
   "FILES_DIRECTORY" : "data_1",
   "KEYS_DIRECTORY" : "keys_1",
   "HASH_SECRET" : "test",

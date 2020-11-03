@@ -23,7 +23,7 @@ describe('API GET : nodes down', () => {
       });
     });
 
-    it('should get a file not present on current node 100 : 100; 200; [File] 101 || node 200 down', function (done) {
+    it('should get a file not present on current node 100 : 100; 200; [File] 201 || node 200 down', function (done) {
       this.timeout(2500);
 
       utils.runArchi('get', [
@@ -34,7 +34,7 @@ describe('API GET : nodes down', () => {
         fetch(nodes[0].host + '/c/test/f/image.jpg?access_key=secret').then(res => {
           should(res.status).eql(200);
 
-          let pathDir  = path.join(__dirname, 'datasets', 'get', 'data_100', '100-101-200', 'test');
+          let pathDir  = path.join(__dirname, 'datasets', 'get', 'data_100', '100-200-201', 'test');
           let filename = utils.getFileHash('image.jpg', config.HASH_SECRET);
           fs.access(path.join(pathDir, filename + '.enc'), (err) => {
             should(err).not.ok();
@@ -48,7 +48,7 @@ describe('API GET : nodes down', () => {
       });
     });
 
-    it('should get a file not present on current node 200 : 100; 200; [File] 101 || 100 down', function (done) {
+    it('should get a file not present on current node 101 : 100; 200; [File] 201', function (done) {
       this.timeout(2500);
 
       utils.runArchi('get', [
@@ -57,10 +57,10 @@ describe('API GET : nodes down', () => {
         , ['start', '-c', path.join('..', 'configs', '201.json')]
       ], () => {
 
-        fetch(nodes[2].host + '/c/test/f/image.jpg?access_key=secret').then(res => {
+        fetch(nodes[1].host + '/c/test/f/image.jpg?access_key=secret').then(res => {
           should(res.status).eql(200);
 
-          let pathDir = path.join(__dirname, 'datasets', 'get', 'data_200', '100-101-200', 'test');
+          let pathDir = path.join(__dirname, 'datasets', 'get', 'data_200', '100-200-201', 'test');
           let filename = utils.getFileHash('image.jpg', config.HASH_SECRET);
           fs.access(path.join(pathDir, filename + '.enc'), (err) => {
             should(err).not.ok();
