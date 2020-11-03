@@ -3,6 +3,8 @@
 ## v0.6.0
 **2020-11-03**
   - Add route `GET /node/stats` to retrieve useful usage statistics (ie README).
+  - Add `./fpark run <job>`. Execute arbitrary job. Only `distribute-space` is defined in order to redistribute files among Fpark instances after `config.NODES` update.
+  - Add `./fpark whereis <filename> ` to know what a file will look like in Fpark.
   - **Breaking changes**:
     - File repartition has changed. Previously, repartition started from the filename modulo the number of replicas. Now, repartition starts from the hash of the filename modulo the number of nodes.
 
