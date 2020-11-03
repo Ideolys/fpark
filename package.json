@@ -1,6 +1,6 @@
 {
   "name": "fpark",
-  "version": "0.5.6",
+  "version": "0.6.0",
   "main": "index.js",
   "scripts": {
     "test": "mocha tests/test.*.js -w"
@@ -30,6 +30,8 @@
   },
   "description": "",
   "pkg": {
-    "scripts": ["jobs/*.js"]
+    "scripts": [
+      "jobs/*.js"
+    ]
   }
 }
