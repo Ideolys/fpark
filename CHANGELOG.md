@@ -1,5 +1,9 @@
 # Changelog
 
+## v0.6.1
+*2020-11-17*
+  - Set open metrics as default format for route `GET /node/stats`.
+
 ## v0.6.0
 **2020-11-03**
   - Add route `GET /node/stats` to retrieve useful usage statistics (ie README).
