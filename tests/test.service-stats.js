@@ -16,7 +16,7 @@ describe('stats', () => {
     runArchi('service-registration', [
       ['start', '-c', path.join('..', 'configs', '100-stats.json')]
     ], () => {
-      fetch(url, {
+      fetch(url + '?format=json', {
         method : 'GET',
       }).then(res => {
         should(res.status).eql(200);
@@ -32,11 +32,11 @@ describe('stats', () => {
     });
   });
 
-  it('should get stats if format = prometheus', done => {
+  it('should get stats if default format (open metrics)', done => {
     runArchi('service-registration', [
       ['start', '-c', path.join('..', 'configs', '100-stats.json')]
     ], () => {
-      fetch(url + '?format=prometheus', {
+      fetch(url, {
         method : 'GET',
       }).then(res => {
         should(res.status).eql(200);

@@ -92,7 +92,7 @@ function nodeRegister (req, res, params, store) {
   });
 }
 
-function nodeStats (req, res, params, store) {
+function nodeStats (req, res) {
   stats.getAll(statistics => {
     if (!statistics) {
       return _formatStatsForJSON(res, statistics);
@@ -102,21 +102,21 @@ function nodeStats (req, res, params, store) {
     let queryParams = new URLSearchParams(query);
     let format      = queryParams.get('format');
 
-    if (format === 'prometheus') {
-      return _formatStatsForPrometheus(res, statistics);
+    if (format === 'json') {
+      return _formatStatsForJSON(res, statistics);
     }
 
 
-    _formatStatsForJSON(res, statistics);
+    _formatStatsForOpenMetrics(res, statistics);
   });
 }
 
 /**
- * Format statistics for prometheus
+ * Format statistics for open metrics
  * @param {Object} res
  * @param {Array} statistics [{ label : String, description : Object, value : * }]
  */
-function _formatStatsForPrometheus (res, statistics) {
+function _formatStatsForOpenMetrics (res, statistics) {
   let result = '';
 
   for (let i = 0; i < statistics.length; i++) {

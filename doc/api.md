@@ -43,7 +43,7 @@ The url can be disabled with `IS_REGISTRATION_ENABLED`.
 
 ## GET /node/stats
 
-Get Fpark statistics.
+Get Fpark statistics (default, open metrics format).
 
 Statistic                                             | Description
 ------------------------------------------------------|------------
@@ -53,4 +53,4 @@ Statistic                                             | Description
 `fpark_requests_total`                                | Sum of number of requests
 `fpark_files_count_total`                             | Count of reads & writes of files
 
-Query option for the url is `format` wihch accepts the following values: `json`, `prometheus`.
+Query option for the url is `format` wihch accepts the following values: `json`, `openmetrics`.
