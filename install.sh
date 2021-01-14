@@ -25,7 +25,7 @@ then
 fi
 
 sudo -u fpark tar -xzf build.tar.gz -C /var/www/fpark
-sudo -u fpark ln -s /var/www/fpark/sharp/build/Release/fpark /var/www/fpark/fpark
+sudo -u fpark ln -sf /var/www/fpark/sharp/build/Release/fpark /var/www/fpark/fpark
 
 echo "Register service..."
 curl -s https://raw.githubusercontent.com/Ideolys/fpark/v${PACKAGE_VERSION}/systemd > /etc/systemd/system/fpark.service
