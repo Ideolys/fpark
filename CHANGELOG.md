@@ -1,5 +1,9 @@
 # Changelog
 
+## v0.6.2
+*2021-01-14*
+  - Stats were not computed cluster mode.
+
 ## v0.6.1
 *2020-11-17*
   - Set open metrics as default format for route `GET /node/stats`.

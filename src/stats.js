@@ -304,15 +304,13 @@ if (cluster.isMaster) {
     },
   };
 
-  setInterval(() => {
-    COUNTERS.REQUEST_DURATION_AVG_GET.aggValue = AGGREGATORS.AVG.getStartValue();
-    COUNTERS.REQUEST_DURATION_AVG_PUT.aggValue = AGGREGATORS.AVG.getStartValue();
-    COUNTERS.REQUEST_DURATION_AVG_DEL.aggValue = AGGREGATORS.AVG.getStartValue();
-  }, 1000);
-
   cluster.on('message', (worker, msg) => {
-    if (!msg ) {
+    if (!msg) {
       return;
+    }
+
+    if (msg.counterId)  {
+      return stats.update(msg);
     }
 
     let statistics = getCounterValues();
@@ -341,7 +339,7 @@ if (cluster.isWorker === true) {
 let workerCallbackQueue   = {};
 let workerCallbackQueueId = 0;
 
-module.exports = {
+const stats = {
   COUNTERS,
 
   COUNTER_NAMESPACES : {
@@ -364,6 +362,10 @@ module.exports = {
    * @param {Object} object.value
    */
   update ({ counterId, subCounterId, value }) {
+    if (cluster.isWorker) {
+      return process.send(...arguments);
+    }
+
     let counter = COUNTERS[counterId];
 
     if (!counter) {
@@ -401,3 +403,5 @@ module.exports = {
     });
   }
 };
+
+module.exports = stats;
