@@ -1,5 +1,9 @@
 # Changelog
 
+## V0.6.3
+*2021-01-21*
+  - The service crashed when getting a file with non ASCII chars in filename.
+
 ## v0.6.2
 *2021-01-14*
   - Stats were not computed cluster mode.
