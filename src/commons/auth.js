@@ -1,10 +1,12 @@
-const path    = require('path');
-const fs      = require('fs');
-const cluster = require('cluster');
-const url     = require('url');
-const jwt     = require('jsonwebtoken');
-const cache   = require('kitten-cache');
-const lru     = new cache({
+const path         = require('path');
+const fs           = require('fs');
+const cluster      = require('cluster');
+const url          = require('url');
+const jwt          = require('jsonwebtoken');
+const cache        = require('kitten-cache');
+const kittenLogger = require('kitten-logger');
+const logger       = kittenLogger.createPersistentLogger('auth');
+const lru          = new cache({
   size : 10000
 });
 const { respond, queue } = require('./utils');
@@ -68,6 +70,7 @@ module.exports = {
     let _token       = req.headers.authorization;
 
     if (!_token) {
+      logger.info('No token', { idKittenLogger : req.log_id });
       return respond(res, 401);
     }
 
@@ -78,6 +81,7 @@ module.exports = {
       _containerIdJWT = JSON.parse(Buffer.from(_token.split('.')[1], 'base64').toString()).aud;
     }
     catch (e) {
+      logger.info('Cannot extract container id from JWT', { idKittenLogger : req.log_id });
       return respond(res, 401);
     }
 
@@ -86,21 +90,25 @@ module.exports = {
       return callback(_cachedResponse);
     }
     else if (_cachedResponse === false) {
+      logger.info('False JWT from cache', { idKittenLogger : req.log_id });
       return respond(res, 401);
     }
 
     if (!keys[_containerIdJWT]) {
+      logger.info('Unregistered container', { idKittenLogger : req.log_id });
       return respond(res, 401);
     }
 
     jwt.verify(_token, keys[_containerIdJWT], (err, decoded) => {
       if (err) {
         lru.set(_token, false);
+        logger.info('False JWT', { idKittenLogger : req.log_id });
         return respond(res, 401);
       }
 
       if (_containerId != _containerIdJWT) {
         lru.set(_token, false);
+        logger.info('False JWT: container from route different from container from JWT', { idKittenLogger : req.log_id });
         return respond(res, 401);
       }
 
