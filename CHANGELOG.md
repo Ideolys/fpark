@@ -1,10 +1,14 @@
 # Changelog
 
-## V0.6.4
+## v0.6.5
+*2021-01-27*
+ - Inter-communication between master / workers was incorrect.
+
+## v0.6.4
 *2021-01-27*
  - Add logs for auth (when it is in error).
 
-## V0.6.3
+## v0.6.3
 *2021-01-21*
   - The service crashed when getting a file with non ASCII chars in filename.
 
