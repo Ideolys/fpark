@@ -8,11 +8,28 @@ kittenLogger.addFormatter('http:end'  , kittenLogger.formattersCollection.http_e
 const loggerStart  = kittenLogger.createPersistentLogger('http:start');
 const loggerEnd    = kittenLogger.createPersistentLogger('http:end');
 
+const uidReference   = (new Date(2021, 0, 1)).getTime();
+let uidPrevTimestamp = null;
+
 /**
- * Get random 32 bits integer
+ * Generate an integer unique id
+ * Be careful, this is unique only for this process id. Another process could generate the same number at the same time.
+ * It can generate 10000 unique id per ms maximum.
+ * It is a combination of a timestamp and a counter. The counter is used only if uid() is called within the same millisecond.
+ * The timestamp start at on 2021-01-01 instead of 1970 to avoid Number overflow.
+ * An JS number is represented by a double-precision float (2^53 bit max).
+ * @return {Integer} Unique id
  */
-function randU32() {
-  return crypto.randomBytes(4).readUInt32BE(0, true);
+function uid (){
+  var _now = (Date.now() - uidReference) * 10000;
+  if(_now !== uidPrevTimestamp){
+    uidCounter = 0;
+  }
+  if(uidCounter >= 10000){
+    throw new Error('helper: uid() does not generate a unique id');
+  }
+  uidPrevTimestamp = _now;
+  return _now + uidCounter++;
 }
 
 function getMessageForReq (req) {
@@ -60,7 +77,7 @@ function getMessageForRes (req, res) {
  */
 module.exports = function logHTTP (req, res) {
   req.log_start = process.hrtime();
-  req.log_id    = randU32();
+  req.log_id    = uid();
 
   loggerStart.info(getMessageForReq(req), { idKittenLogger : req.log_id });
 
