@@ -110,7 +110,7 @@ module.exports = {
     jwt.verify(_token, keys[_containerIdJWT], (err, decoded) => {
       if (err) {
         lru.set(_token, false);
-        logger.info('False JWT', { idKittenLogger : req.log_id });
+        logger.info('False JWT, err=' + err, { idKittenLogger : req.log_id });
         return respond(res, 401);
       }
 
