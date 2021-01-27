@@ -245,7 +245,7 @@ describe('API GET', () => {
       });
 
       it('should set content-disposition header and not crash with character outside ASCII range', done => {
-        fetch(url + encodeURI('/c/test/f/Capture d’écran.txt?access_key=secret')).then(res => {
+        fetch(url + '/c/test/f/' + encodeURI('Capture d’écran.txt') + '?access_key=secret').then(res => {
           should(res.status).eql(200);
           should(res.headers.get('content-disposition')).eql('inline; filename="' + encodeURI('Capture d’écran.txt') + '"');
           done();
