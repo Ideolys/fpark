@@ -11,6 +11,8 @@ const lru          = new cache({
 });
 const { respond, queue } = require('./utils');
 
+jwt.set( { serverCacheSize : 1000 } );
+
 const PUBLIC_KEY_FILE_EXTENSION = '.pub';
 const ACCESS_KEY_FILE_EXTENSION = '.access_key';
 const keys                      = {};
