@@ -2,7 +2,7 @@ const path         = require('path');
 const fs           = require('fs');
 const cluster      = require('cluster');
 const url          = require('url');
-const jwt          = require('jsonwebtoken');
+const jwt          = require('kitten-jwt');
 const cache        = require('kitten-cache');
 const kittenLogger = require('kitten-logger');
 const logger       = kittenLogger.createPersistentLogger('auth');
@@ -63,6 +63,22 @@ function setKey (container, key) {
   }
 }
 
+/**
+ * Get public for container
+ * @param {Object} req
+ * @param {Object} res
+ * @param {String} keyname
+ * @param {Function} callback publicKey
+ */
+function getPublicKey (req, res, keyname, callback) {
+  if (!keys[keyname.iss]) {
+    logger.info('Unregistered container', { idKittenLogger : req.log_id });
+    return respond(res, 401);
+  }
+
+  callback(keys[keyname.iss]);
+}
+
 module.exports = {
 
   setKey,
@@ -93,34 +109,18 @@ module.exports = {
       return respond(res, 401);
     }
 
-    let _cachedResponse = lru.get(_token);
-    if (_cachedResponse) {
-      return callback(_cachedResponse);
-    }
-    else if (_cachedResponse === false) {
-      logger.info('False JWT from cache', { idKittenLogger : req.log_id });
-      return respond(res, 401);
-    }
-
-    if (!keys[_containerIdJWT]) {
-      logger.info('Unregistered container', { idKittenLogger : req.log_id });
-      return respond(res, 401);
-    }
-
-    jwt.verify(_token, keys[_containerIdJWT], (err, decoded) => {
+    jwt.verifyHTTPHeaderFn(_containerIdJWT, getPublicKey)(req, res, err => {
       if (err) {
-        lru.set(_token, false);
         logger.info('False JWT, err=' + err, { idKittenLogger : req.log_id });
         return respond(res, 401);
       }
 
       if (_containerId != _containerIdJWT) {
         lru.set(_token, false);
-        logger.info('False JWT: container from route different from container from JWT', { idKittenLogger : req.log_id });
+        logger.info('False JWT: container from route different from JWT', { idKittenLogger : req.log_id });
         return respond(res, 401);
       }
 
-      lru.set(_token, _containerIdJWT);
       callback(_containerIdJWT);
     });
   },
