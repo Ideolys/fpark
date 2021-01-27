@@ -1,5 +1,9 @@
 # Changelog
 
+## V0.6.4
+*2021-01-27*
+ - Add logs for auth (when it is in error).
+
 ## V0.6.3
 *2021-01-21*
   - The service crashed when getting a file with non ASCII chars in filename.
