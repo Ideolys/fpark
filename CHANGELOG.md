@@ -1,5 +1,9 @@
 # Changelog
 
+## v0.6.6
+*2021-01-27*
+  - Add dependence `kitten-jwt` for jwt management.
+
 ## v0.6.5
 *2021-01-27*
  - Inter-communication between master / workers was incorrect.
