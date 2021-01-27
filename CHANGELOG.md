@@ -1,5 +1,10 @@
 # Changelog
 
+## v0.6.7
+*2021-01-27*
+ - Increase JWT cache.
+ - Replace uid generation.
+
 ## v0.6.6
 *2021-01-27*
   - Add dependency `kitten-jwt` for jwt management.
