@@ -18,6 +18,10 @@ const accessKeys                = {};
 
 if (cluster.isMaster) {
   cluster.on('message', (worker, message) => {
+    if (!message.container) {
+      return;
+    }
+
     for (const id in cluster.workers) {
       if (id === worker.id) {
         continue;
@@ -30,6 +34,10 @@ if (cluster.isMaster) {
 
 if (cluster.isWorker) {
   process.on('message', (message) => {
+    if (!message.container) {
+      return;
+    }
+
     keys[message.container] = message.key;
   });
 }

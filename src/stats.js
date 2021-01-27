@@ -309,6 +309,10 @@ if (cluster.isMaster) {
       return;
     }
 
+    if (msg.container) {
+      return;
+    }
+
     if (msg.counterId)  {
       return stats.update(msg);
     }
